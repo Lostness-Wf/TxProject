@@ -21,7 +21,6 @@ AFPSCharacterBase::AFPSCharacterBase()
 	if (FPArmsMesh)
 	{
 		FPArmsMesh->SetupAttachment(PlayerCamera);
-		//枪模型仅自己可见
 		FPArmsMesh->SetOnlyOwnerSee(true);
 	}
 	//第三人称骨骼自己不可见
@@ -37,6 +36,24 @@ void AFPSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
+{
+	if (ServerPrimaryWeapon)
+	{
+
+	}
+	else
+	{
+		ServerPrimaryWeapon = WeaponBaseServer;
+		ServerPrimaryWeapon->SetOwner(this);
+		ServerPrimaryWeapon->K2_AttachToComponent(GetMesh(), "Weapon_Right",
+			EAttachmentRule::SnapToTarget,
+			EAttachmentRule::SnapToTarget,
+			EAttachmentRule::SnapToTarget,
+			true);
+	}
 }
 
 // Called every frame

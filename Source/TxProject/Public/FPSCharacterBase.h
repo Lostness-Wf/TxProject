@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Camera/CameraComponent.h"
+#include "WeaponBaseServer.h"
+
 #include "FPSCharacterBase.generated.h"
 
 UCLASS()
@@ -34,7 +36,14 @@ protected:
 	void StopJumpAction();
 	void LowSpeedWalkAction();
 	void NormalSpeedWalkAction();
-public:	
+
+public:
+	void EquipPrimary(AWeaponBaseServer* WeaponBaseServer);
+
+private:
+	UPROPERTY(meta = (AllowPrivateAccess = "true"))
+	AWeaponBaseServer* ServerPrimaryWeapon;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
