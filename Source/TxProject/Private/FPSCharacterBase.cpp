@@ -2,6 +2,7 @@
 
 
 #include "FPSCharacterBase.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -58,7 +59,32 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	InputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AFPSCharacterBase::JumpAction);
 	InputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AFPSCharacterBase::StopJumpAction);
+
+	InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Pressed, this, &AFPSCharacterBase::LowSpeedWalkAction);
+	InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Released, this, &AFPSCharacterBase::NormalSpeedWalkAction);
 }
+
+
+void AFPSCharacterBase::ServerLowSpeedWalkAction_Implementation()
+{
+	this->GetCharacterMovement()->MaxWalkSpeed = 300;
+}
+
+bool AFPSCharacterBase::ServerLowSpeedWalkAction_Validate()
+{
+	return true;
+}
+
+void AFPSCharacterBase::ServerNormalSpeedWalkAction_Implementation()
+{
+	this->GetCharacterMovement()->MaxWalkSpeed = 600;
+}
+
+bool AFPSCharacterBase::ServerNormalSpeedWalkAction_Validate()
+{
+	return true;
+}
+
 
 void AFPSCharacterBase::MoveRight(float AxisValue)
 {
@@ -78,4 +104,16 @@ void AFPSCharacterBase::JumpAction()
 void AFPSCharacterBase::StopJumpAction()
 {
 	StopJumping();
+}
+
+void AFPSCharacterBase::LowSpeedWalkAction()
+{
+	this->GetCharacterMovement()->MaxWalkSpeed = 300;
+	ServerLowSpeedWalkAction();
+}
+
+void AFPSCharacterBase::NormalSpeedWalkAction()
+{
+	this->GetCharacterMovement()->MaxWalkSpeed = 600;
+	ServerNormalSpeedWalkAction();
 }

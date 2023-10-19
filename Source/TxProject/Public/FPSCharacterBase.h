@@ -32,6 +32,8 @@ protected:
 
 	void JumpAction();
 	void StopJumpAction();
+	void LowSpeedWalkAction();
+	void NormalSpeedWalkAction();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -39,4 +41,15 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+public:
+	//RPCÍøÂçÍ¬²½
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerLowSpeedWalkAction();
+	void ServerLowSpeedWalkAction_Implementation();
+	bool ServerLowSpeedWalkAction_Validation();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerNormalSpeedWalkAction();
+	void ServerNormalSpeedWalkAction_Implementation();
+	bool ServerNormalSpeedWalkAction_Validation();
 };
