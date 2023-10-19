@@ -27,6 +27,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void MoveRight(float AxisValue);
+	void MoveForward(float AxisValue);
+
+	void JumpAction();
+	void StopJumpAction();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

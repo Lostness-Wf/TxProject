@@ -13,6 +13,7 @@ AFPSCharacterBase::AFPSCharacterBase()
 	if (PlayerCamera)
 	{
 		PlayerCamera->SetupAttachment(RootComponent);
+		PlayerCamera->bUsePawnControlRotation = true;
 	}
 
 	FPArmsMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FPArmsMesh"));
@@ -49,5 +50,32 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	InputComponent->BindAxis(TEXT("MoveRight"), this, &AFPSCharacterBase::MoveRight);
+	InputComponent->BindAxis(TEXT("MoveForward"), this, &AFPSCharacterBase::MoveForward);
+
+	InputComponent->BindAxis(TEXT("Turn"), this, &AFPSCharacterBase::AddControllerYawInput);
+	InputComponent->BindAxis(TEXT("LookUp"), this, &AFPSCharacterBase::AddControllerPitchInput);
+
+	InputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AFPSCharacterBase::JumpAction);
+	InputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AFPSCharacterBase::StopJumpAction);
 }
 
+void AFPSCharacterBase::MoveRight(float AxisValue)
+{
+	AddMovementInput(GetActorRightVector(), AxisValue, false);
+}
+
+void AFPSCharacterBase::MoveForward(float AxisValue)
+{
+	AddMovementInput(GetActorForwardVector(), AxisValue, false);
+}
+
+void AFPSCharacterBase::JumpAction()
+{
+	Jump();
+}
+
+void AFPSCharacterBase::StopJumpAction()
+{
+	StopJumping();
+}
