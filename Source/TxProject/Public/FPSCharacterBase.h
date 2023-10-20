@@ -47,6 +47,11 @@ private:
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AWeaponBaseClient* ClientPrimaryWeapon;
 
+	//³õÊ¼×Ô´øÎäÆ÷
+	void StartWithKindOfWeapon();
+
+	void PurchaseWeapon(EWeaponType WeaponType);
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

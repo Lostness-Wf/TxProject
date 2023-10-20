@@ -35,6 +35,8 @@ AFPSCharacterBase::AFPSCharacterBase()
 void AFPSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	StartWithKindOfWeapon();
 	
 }
 
@@ -82,6 +84,46 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Released, this, &AFPSCharacterBase::NormalSpeedWalkAction);
 }
 
+
+void AFPSCharacterBase::StartWithKindOfWeapon()
+{
+	if (HasAuthority())
+	{
+		PurchaseWeapon(EWeaponType::AK47);
+	}
+}
+
+void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
+{
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Owner = this;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	switch (WeaponType)
+	{
+	case EWeaponType::None:
+		{
+		}
+		break;
+
+	case EWeaponType::AK47:
+		{
+		UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C'"));
+		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+		ServerWeapon->EquipWeapon();
+		EquipPrimary(ServerWeapon);
+		}
+		break;
+
+	case EWeaponType::DesertEagle:
+		{
+		}
+		break;
+
+	default:
+		break;
+	}
+}
 
 void AFPSCharacterBase::ServerLowSpeedWalkAction_Implementation()
 {
