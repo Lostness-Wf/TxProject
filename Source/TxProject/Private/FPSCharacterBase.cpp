@@ -94,6 +94,7 @@ void AFPSCharacterBase::FireWeaponPrimary()
 	//服务器调用，减少弹药，射线，伤害，弹孔
 
 	//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
+	ClientFire();
 }
 
 void AFPSCharacterBase::StopFirePrimary()
@@ -141,6 +142,27 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 	}
 }
 
+AWeaponBaseClient* AFPSCharacterBase::GetCurrentClientFPArmsWeaponActor()
+{
+	switch (ActiveWeapon)
+	{
+		case EWeaponType::None:
+			return nullptr;
+			break;
+		case EWeaponType::AK47:
+		{
+			return ClientPrimaryWeapon;
+		}
+			break;
+		case EWeaponType::DesertEagle:
+			return nullptr;
+			break;
+		default:
+			return nullptr;
+			break;
+	}
+}
+
 void AFPSCharacterBase::ServerLowSpeedWalkAction_Implementation()
 {
 	this->GetCharacterMovement()->MaxWalkSpeed = 300;
@@ -184,6 +206,15 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 				EAttachmentRule::SnapToTarget,
 				true);
 		}
+	}
+}
+
+void AFPSCharacterBase::ClientFire_Implementation()
+{
+	AWeaponBaseClient* CurrentWeapon = GetCurrentClientFPArmsWeaponActor();
+	if (ClientPrimaryWeapon)
+	{
+		CurrentWeapon->PlayShootAnimation();
 	}
 }
 

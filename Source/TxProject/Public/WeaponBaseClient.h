@@ -15,7 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	AWeaponBaseClient();
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* WeaponMesh;
 
 protected:
@@ -26,4 +26,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "FPGunAnimation")
+	void PlayShootAnimation();
 };

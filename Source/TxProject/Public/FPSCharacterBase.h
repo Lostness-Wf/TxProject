@@ -57,6 +57,8 @@ private:
 
 	void PurchaseWeapon(EWeaponType WeaponType);
 	
+	AWeaponBaseClient* GetCurrentClientFPArmsWeaponActor();
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -82,4 +84,7 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientEquipFPArmsPriamry();
+
+	UFUNCTION(Server, Reliable)
+	void ClientFire();
 };
