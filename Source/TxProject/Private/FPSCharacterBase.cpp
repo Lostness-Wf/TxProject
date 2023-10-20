@@ -82,8 +82,24 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Pressed, this, &AFPSCharacterBase::LowSpeedWalkAction);
 	InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Released, this, &AFPSCharacterBase::NormalSpeedWalkAction);
+
+	InputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AFPSCharacterBase::InputFirePressed);
+	InputComponent->BindAction(TEXT("Fire"), IE_Released, this, &AFPSCharacterBase::InputFireReleased);
 }
 
+
+void AFPSCharacterBase::FireWeaponPrimary()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Call FireWeaponPrimary"));  //Temp
+	//服务器调用，减少弹药，射线，伤害，弹孔
+
+	//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
+}
+
+void AFPSCharacterBase::StopFirePrimary()
+{
+
+}
 
 void AFPSCharacterBase::StartWithKindOfWeapon()
 {
@@ -201,4 +217,50 @@ void AFPSCharacterBase::NormalSpeedWalkAction()
 {
 	this->GetCharacterMovement()->MaxWalkSpeed = 600;
 	ServerNormalSpeedWalkAction();
+}
+
+void AFPSCharacterBase::InputFirePressed()
+{
+	switch (ActiveWeapon)
+	{
+		case EWeaponType::None:
+		break;
+
+		case EWeaponType::AK47:
+		{
+			FireWeaponPrimary();
+		}
+		break;
+
+		case EWeaponType::DesertEagle:
+		{
+		}
+		break;
+
+		default:
+		break;
+	}
+}
+
+void AFPSCharacterBase::InputFireReleased()
+{
+	switch (ActiveWeapon)
+	{
+		case EWeaponType::None:
+		break;
+
+		case EWeaponType::AK47:
+		{
+			StopFirePrimary();
+		}
+		break;
+
+		case EWeaponType::DesertEagle:
+		{
+		}
+		break;
+
+		default:
+		break;
+	}
 }

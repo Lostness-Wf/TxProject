@@ -36,6 +36,8 @@ protected:
 	void StopJumpAction();
 	void LowSpeedWalkAction();
 	void NormalSpeedWalkAction();
+	void InputFirePressed();
+	void InputFireReleased();
 
 public:
 	void EquipPrimary(AWeaponBaseServer* WeaponBaseServer);
@@ -47,6 +49,9 @@ private:
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AWeaponBaseClient* ClientPrimaryWeapon;
 
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Test")  //Temp
+	EWeaponType ActiveWeapon;
+
 	//³õÊ¼×Ô´øÎäÆ÷
 	void StartWithKindOfWeapon();
 
@@ -57,6 +62,11 @@ private:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	//²½Ç¹Éä»÷
+	void FireWeaponPrimary();
+	//Í£Ö¹Éä»÷
+	void StopFirePrimary();
 
 public:
 	//RPCÍøÂçÍ¬²½
