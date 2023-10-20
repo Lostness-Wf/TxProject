@@ -51,7 +51,7 @@ private:
 	void StartWithKindOfWeapon();
 
 	void PurchaseWeapon(EWeaponType WeaponType);
-
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
