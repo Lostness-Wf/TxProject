@@ -48,11 +48,12 @@ void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
 	{
 		ServerPrimaryWeapon = WeaponBaseServer;
 		ServerPrimaryWeapon->SetOwner(this);
-		ServerPrimaryWeapon->K2_AttachToComponent(GetMesh(), "Weapon_Right",
+		ServerPrimaryWeapon->K2_AttachToComponent(GetMesh(), TEXT("Weapon_Right"),
 			EAttachmentRule::SnapToTarget,
 			EAttachmentRule::SnapToTarget,
 			EAttachmentRule::SnapToTarget,
-			true);
+			true);  
+		ClientEquipFPArmsPriamry();
 	}
 }
 
@@ -102,6 +103,31 @@ bool AFPSCharacterBase::ServerNormalSpeedWalkAction_Validate()
 	return true;
 }
 
+
+void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
+{
+	if (ServerPrimaryWeapon)
+	{
+		if (ClientPrimaryWeapon)
+		{
+
+		}
+		else
+		{
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.Owner = this;
+			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			ClientPrimaryWeapon = GetWorld()->SpawnActor<AWeaponBaseClient>(ServerPrimaryWeapon->ClientWeaponBaseBPClass,
+				GetActorTransform(),
+				SpawnInfo);
+			ClientPrimaryWeapon->K2_AttachToComponent(FPArmsMesh, TEXT("WeaponSocket"),
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::SnapToTarget,
+				true);
+		}
+	}
+}
 
 void AFPSCharacterBase::MoveRight(float AxisValue)
 {

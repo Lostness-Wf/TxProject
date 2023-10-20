@@ -44,6 +44,9 @@ private:
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AWeaponBaseServer* ServerPrimaryWeapon;
 
+	UPROPERTY(meta = (AllowPrivateAccess = "true"))
+	AWeaponBaseClient* ClientPrimaryWeapon;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -61,4 +64,7 @@ public:
 	void ServerNormalSpeedWalkAction();
 	void ServerNormalSpeedWalkAction_Implementation();
 	bool ServerNormalSpeedWalkAction_Validation();
+
+	UFUNCTION(Client, Reliable)
+	void ClientEquipFPArmsPriamry();
 };
