@@ -41,6 +41,11 @@ void AFPSCharacterBase::BeginPlay()
 	ClientArmsAnimBP = FPArmsMesh->GetAnimInstance();
 
 	FPSPlayerController = Cast<AMultiFPSPlayerController>(GetController());
+
+	if (FPSPlayerController)
+	{
+		FPSPlayerController->CreatPlayerUI();
+	}
 }
 
 void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
@@ -231,6 +236,8 @@ void AFPSCharacterBase::ClientFire_Implementation()
 		//Camera Shake
 		FPSPlayerController->PlayerCameraShake(CurrentWeapon->CameraShakeClass);
 
+		//×¼ÐÇÀ©É¢¶¯»­
+		FPSPlayerController->DoCrosshairRecoil();
 	}
 
 }

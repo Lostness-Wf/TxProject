@@ -16,4 +16,9 @@ class TXPROJECT_API AMultiFPSPlayerController : public APlayerController
 public:
 	void PlayerCameraShake(TSubclassOf<UCameraShakeBase> CameraShake);
 	
+	UFUNCTION(BlueprintImplementableEvent, Category = "PlayerUI")
+	void CreatPlayerUI();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "PlayerUI")
+	void DoCrosshairRecoil();
 };
