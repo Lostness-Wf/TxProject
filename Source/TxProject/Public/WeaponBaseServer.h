@@ -52,4 +52,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* MuzzleFlash;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void MultiShootingEffect();
+	void MultiShootingEffect_Implementation();
+	bool MultiShootingEffect_Validation();
 };

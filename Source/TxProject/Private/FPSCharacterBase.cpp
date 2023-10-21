@@ -193,7 +193,8 @@ bool AFPSCharacterBase::ServerNormalSpeedWalkAction_Validate()
 
 void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
 {
-
+	//RPC×é²¥
+	ServerPrimaryWeapon->MultiShootingEffect();
 }
 
 bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
