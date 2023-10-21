@@ -39,6 +39,8 @@ void AFPSCharacterBase::BeginPlay()
 	StartWithKindOfWeapon();
 	
 	ClientArmsAnimBP = FPArmsMesh->GetAnimInstance();
+
+	FPSPlayerController = Cast<AMultiFPSPlayerController>(GetController());
 }
 
 void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
@@ -212,20 +214,25 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 
 void AFPSCharacterBase::ClientFire_Implementation()
 {
-	//播放枪支设计动画
 	AWeaponBaseClient* CurrentWeapon = GetCurrentClientFPArmsWeaponActor();
 	if (ClientPrimaryWeapon)
 	{
+		//播放枪支设计动画
 		CurrentWeapon->PlayShootAnimation();
+
+		//射击手臂动画
+		UAnimMontage* ClientArmsFireMontage = CurrentWeapon->ClientArmsFireMontage;
+		ClientArmsAnimBP->Montage_Play(ClientArmsFireMontage);
+		ClientArmsAnimBP->Montage_SetPlayRate(ClientArmsFireMontage, 1);
+
+		//本地射击效果（声音，粒子）
+		CurrentWeapon->DisplayWeaponEffect();
+
+		//Camera Shake
+		FPSPlayerController->PlayerCameraShake(CurrentWeapon->CameraShakeClass);
+
 	}
 
-	//射击手臂动画
-	UAnimMontage* ClientArmsFireMontage = CurrentWeapon->ClientArmsFireMontage;
-	ClientArmsAnimBP->Montage_Play(ClientArmsFireMontage);
-	ClientArmsAnimBP->Montage_SetPlayRate(ClientArmsFireMontage, 1);
-
-	//本地射击效果（声音，粒子）
-	CurrentWeapon->DisplayWeaponEffect();
 }
 
 void AFPSCharacterBase::MoveRight(float AxisValue)

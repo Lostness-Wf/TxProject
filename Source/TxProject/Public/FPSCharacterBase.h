@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Camera/CameraComponent.h"
 #include "WeaponBaseServer.h"
+#include "MultiFPSPlayerController.h"
 
 #include "FPSCharacterBase.generated.h"
 
@@ -26,6 +27,9 @@ private:
 	USkeletalMeshComponent* FPArmsMesh;
 
 	UAnimInstance* ClientArmsAnimBP;
+
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	AMultiFPSPlayerController* FPSPlayerController;
 
 protected:
 	// Called when the game starts or when spawned

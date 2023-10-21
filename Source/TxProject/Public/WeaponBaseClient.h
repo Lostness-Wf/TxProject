@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* MuzzleFlash;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCameraShakeBase> CameraShakeClass;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
