@@ -3,6 +3,7 @@
 
 #include "FPSCharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -98,11 +99,19 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFPSCharacterBase::FireWeaponPrimary()
 {
-	//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
-	ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
+	//判断弹夹是否为空
+	if (ServerPrimaryWeapon->ClipCurrentAmmo)
+	{
+		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
+		ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
 
-	//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
-	ClientFire();
+		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
+		ClientFire();
+
+		//Temp
+		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
+	}
+
 }
 
 void AFPSCharacterBase::StopFirePrimary()
@@ -195,6 +204,11 @@ void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocat
 {
 	//RPC组播
 	ServerPrimaryWeapon->MultiShootingEffect();
+
+	ServerPrimaryWeapon->ClipCurrentAmmo -= 1;
+
+	//Temp
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
 }
 
 bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)

@@ -5,6 +5,7 @@
 #include "FPSCharacterBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Actor.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AWeaponBaseServer::AWeaponBaseServer()
@@ -85,3 +86,7 @@ bool AWeaponBaseServer::MultiShootingEffect_Validate()
 	return true;
 }
 
+void AWeaponBaseServer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	DOREPLIFETIME_CONDITION(AWeaponBaseServer, ClipCurrentAmmo, COND_None);
+}
