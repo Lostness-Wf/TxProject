@@ -69,12 +69,15 @@ void AWeaponBaseServer::MultiShootingEffect_Implementation()
 {
 	if (GetOwner() != UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
 	{
+		//»ðÑæÁ£×ÓVFX
 		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, WeaponMesh,
 			TEXT("Fire_FX_Slot"), FVector::ZeroVector,
 			FRotator::ZeroRotator, FVector::OneVector,
 			EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None,
 			true);
-	}
+
+
+	}UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GetActorLocation());
 }
 
 bool AWeaponBaseServer::MultiShootingEffect_Validate()

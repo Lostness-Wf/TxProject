@@ -55,6 +55,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* MuzzleFlash;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* FireSound;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();
