@@ -224,6 +224,8 @@ void AFPSCharacterBase::ClientFire_Implementation()
 	ClientArmsAnimBP->Montage_Play(ClientArmsFireMontage);
 	ClientArmsAnimBP->Montage_SetPlayRate(ClientArmsFireMontage, 1);
 
+	//本地射击效果（声音，粒子）
+	CurrentWeapon->DisplayWeaponEffect();
 }
 
 void AFPSCharacterBase::MoveRight(float AxisValue)

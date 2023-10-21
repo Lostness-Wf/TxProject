@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* ClientArmsFireMontage;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* FireSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,4 +34,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "FPGunAnimation")
 	void PlayShootAnimation();
+
+	//Éä»÷ÉùÒô£¬Á£×Ó
+	void DisplayWeaponEffect();
 };

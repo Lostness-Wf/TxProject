@@ -2,6 +2,7 @@
 
 
 #include "WeaponBaseClient.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AWeaponBaseClient::AWeaponBaseClient()
@@ -26,5 +27,10 @@ void AWeaponBaseClient::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AWeaponBaseClient::DisplayWeaponEffect()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
 }
 
