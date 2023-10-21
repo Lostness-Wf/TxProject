@@ -88,6 +88,11 @@ public:
 	void ServerNormalSpeedWalkAction_Implementation();
 	bool ServerNormalSpeedWalkAction_Validation();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFireRifleWeapon(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+	void ServerFireRifleWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+	bool ServerFireRifleWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+
 	UFUNCTION(Client, Reliable)
 	void ClientEquipFPArmsPriamry();
 

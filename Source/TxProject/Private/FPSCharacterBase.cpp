@@ -98,8 +98,8 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFPSCharacterBase::FireWeaponPrimary()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Call FireWeaponPrimary"));  //Temp
-	//服务器调用，减少弹药，射线，伤害，弹孔
+	//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
+	ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
 
 	//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
 	ClientFire();
@@ -191,6 +191,15 @@ bool AFPSCharacterBase::ServerNormalSpeedWalkAction_Validate()
 	return true;
 }
 
+void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+
+}
+
+bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	return true;
+}
 
 void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 {
