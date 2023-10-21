@@ -25,6 +25,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FPArmsMesh;
 
+	UAnimInstance* ClientArmsAnimBP;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

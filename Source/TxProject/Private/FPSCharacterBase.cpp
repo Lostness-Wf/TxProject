@@ -38,6 +38,7 @@ void AFPSCharacterBase::BeginPlay()
 
 	StartWithKindOfWeapon();
 	
+	ClientArmsAnimBP = FPArmsMesh->GetAnimInstance();
 }
 
 void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
@@ -211,11 +212,18 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 
 void AFPSCharacterBase::ClientFire_Implementation()
 {
+	//播放枪支设计动画
 	AWeaponBaseClient* CurrentWeapon = GetCurrentClientFPArmsWeaponActor();
 	if (ClientPrimaryWeapon)
 	{
 		CurrentWeapon->PlayShootAnimation();
 	}
+
+	//射击手臂动画
+	UAnimMontage* ClientArmsFireMontage = CurrentWeapon->ClientArmsFireMontage;
+	ClientArmsAnimBP->Montage_Play(ClientArmsFireMontage);
+	ClientArmsAnimBP->Montage_SetPlayRate(ClientArmsFireMontage, 1);
+
 }
 
 void AFPSCharacterBase::MoveRight(float AxisValue)

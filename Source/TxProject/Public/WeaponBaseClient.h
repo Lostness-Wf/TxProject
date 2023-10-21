@@ -18,6 +18,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USkeletalMeshComponent* WeaponMesh;
 
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* ClientArmsFireMontage;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
