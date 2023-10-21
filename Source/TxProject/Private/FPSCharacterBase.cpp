@@ -40,6 +40,7 @@ void AFPSCharacterBase::BeginPlay()
 	StartWithKindOfWeapon();
 	
 	ClientArmsAnimBP = FPArmsMesh->GetAnimInstance();
+	ServerBodysAnimBP = GetMesh()->GetAnimInstance();
 
 	FPSPlayerController = Cast<AMultiFPSPlayerController>(GetController());
 
@@ -204,20 +205,42 @@ bool AFPSCharacterBase::ServerNormalSpeedWalkAction_Validate()
 
 void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
 {
-	//RPC组播
-	ServerPrimaryWeapon->MultiShootingEffect();
+	if (ServerPrimaryWeapon)
+	{
+		//特效和声音组播
+		ServerPrimaryWeapon->MultiShootingEffect();
+	
+		//子弹数量-1
+		ServerPrimaryWeapon->ClipCurrentAmmo -= 1;
+	
+		//播放第三人称身体射击动画
+		MultiShooting();
 
-	//子弹数量-1
-	ServerPrimaryWeapon->ClipCurrentAmmo -= 1;
-
-	//客户端UI更新
-	ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
+		//客户端UI更新
+		ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
+	}
 
 	//Temp
 	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
 }
 
 bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	return true;
+}
+
+void AFPSCharacterBase::MultiShooting_Implementation()
+{
+	if (ServerBodysAnimBP)
+	{
+		if (ServerPrimaryWeapon)
+		{
+			ServerBodysAnimBP->Montage_Play(ServerPrimaryWeapon->ServerTPBodysShootAnimMontage);
+		}
+	}
+}
+
+bool AFPSCharacterBase::MultiShooting_Validate()
 {
 	return true;
 }

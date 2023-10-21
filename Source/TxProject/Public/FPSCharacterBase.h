@@ -26,7 +26,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* FPArmsMesh;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
 	UAnimInstance* ClientArmsAnimBP;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
+	UAnimInstance* ServerBodysAnimBP;
 
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	AMultiFPSPlayerController* FPSPlayerController;
@@ -92,6 +96,11 @@ public:
 	void ServerFireRifleWeapon(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 	void ServerFireRifleWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 	bool ServerFireRifleWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MultiShooting();
+	void MultiShooting_Implementation();
+	void MultiShooting_Validation();
 
 	UFUNCTION(Client, Reliable)
 	void ClientEquipFPArmsPriamry();

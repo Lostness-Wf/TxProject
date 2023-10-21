@@ -70,6 +70,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 MaxClipAmmo;
 
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* ServerTPBodysShootAnimMontage;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();
