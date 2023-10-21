@@ -238,6 +238,7 @@ void AFPSCharacterBase::ClientFire_Implementation()
 
 		//×¼ÐÇÀ©É¢¶¯»­
 		FPSPlayerController->DoCrosshairRecoil();
+
 	}
 
 }

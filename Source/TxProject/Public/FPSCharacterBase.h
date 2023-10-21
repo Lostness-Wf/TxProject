@@ -91,6 +91,6 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientEquipFPArmsPriamry();
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Client, Reliable)
 	void ClientFire();
 };
