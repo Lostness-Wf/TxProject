@@ -98,4 +98,8 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientFire();
+
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateAmmoUI(int32 ClipCurrentAmmo, int32 GunCurrentAmmo);
+
 };

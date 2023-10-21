@@ -53,7 +53,7 @@ void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
 {
 	if (ServerPrimaryWeapon)
 	{
-
+		UE_LOG(LogTemp, Warning, TEXT("Weapon already exist"))
 	}
 	else
 	{
@@ -63,8 +63,10 @@ void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
 			EAttachmentRule::SnapToTarget,
 			EAttachmentRule::SnapToTarget,
 			EAttachmentRule::SnapToTarget,
-			true);  
+			true);
 		ClientEquipFPArmsPriamry();
+
+		ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
 	}
 }
 
@@ -205,7 +207,11 @@ void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocat
 	//RPC组播
 	ServerPrimaryWeapon->MultiShootingEffect();
 
+	//子弹数量-1
 	ServerPrimaryWeapon->ClipCurrentAmmo -= 1;
+
+	//客户端UI更新
+	ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
 
 	//Temp
 	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
@@ -265,6 +271,14 @@ void AFPSCharacterBase::ClientFire_Implementation()
 
 	}
 
+}
+
+void AFPSCharacterBase::ClientUpdateAmmoUI_Implementation(int32 ClipCurrentAmmo, int32 GunCurrentAmmo)
+{
+	if (FPSPlayerController)
+	{
+		FPSPlayerController->UpdateAmmoUI(ClipCurrentAmmo, GunCurrentAmmo);
+	}
 }
 
 void AFPSCharacterBase::MoveRight(float AxisValue)
