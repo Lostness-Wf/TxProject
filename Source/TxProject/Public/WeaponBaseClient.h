@@ -24,6 +24,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	USoundBase* FireSound;
 
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* MuzzleFlash;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

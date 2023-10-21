@@ -31,6 +31,11 @@ void AWeaponBaseClient::Tick(float DeltaTime)
 
 void AWeaponBaseClient::DisplayWeaponEffect()
 {
+	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, WeaponMesh,
+		TEXT("Fire_FX_Slot"), FVector::ZeroVector,
+		FRotator::ZeroRotator, FVector::OneVector,
+		EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None,
+		true);
 	UGameplayStatics::PlaySound2D(GetWorld(), FireSound);
 }
 
