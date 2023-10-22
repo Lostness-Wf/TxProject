@@ -158,7 +158,7 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 		if (FPSCharacter)
 		{
 			//打到玩家应用伤害
-
+			
 		}
 		else
 		{
@@ -170,6 +170,11 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 
 	}
 
+}
+
+void AFPSCharacterBase::DamagePlayer()
+{
+	UGameplayStatics::ApplyPointDamage();
 }
 
 void AFPSCharacterBase::StartWithKindOfWeapon()

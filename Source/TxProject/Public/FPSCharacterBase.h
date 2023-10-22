@@ -84,6 +84,9 @@ private:
 	//步枪射线检测
 	void RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
+	//玩家伤害应用
+	void DamagePlayer();
+
 public:
 	//静步
 	UFUNCTION(Server, Reliable, WithValidation)
