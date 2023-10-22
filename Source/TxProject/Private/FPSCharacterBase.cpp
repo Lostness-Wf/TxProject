@@ -7,6 +7,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/DecalComponent.h"
+#include "GameFramework/Actor.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -39,6 +41,10 @@ AFPSCharacterBase::AFPSCharacterBase()
 void AFPSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Health = 100;
+
+	OnTakePointDamage.AddDynamic(this, &AFPSCharacterBase::OnHit);
 
 	StartWithKindOfWeapon();
 	
@@ -158,7 +164,7 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 		if (FPSCharacter)
 		{
 			//打到玩家应用伤害
-			
+			DamagePlayer(HitResult.PhysMaterial.Get(), HitResult.GetActor(), CameraLocation, HitResult);
 		}
 		else
 		{
@@ -172,9 +178,55 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 
 }
 
-void AFPSCharacterBase::DamagePlayer()
+void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo)
 {
-	UGameplayStatics::ApplyPointDamage();
+	//根据击中位置应用不同伤害值
+	if (ServerPrimaryWeapon)
+	{
+		switch (PhysicalMaterial->SurfaceType)
+			{
+				case SurfaceType1:
+				{
+					//Head
+					UGameplayStatics::ApplyPointDamage(DamageActor, ServerPrimaryWeapon->BaseDamage * 4, HitFromDirection, HitInfo, GetController(),
+						this, UDamageType::StaticClass());
+				}
+				break;
+		
+				case SurfaceType2:
+				{
+					//Body
+					UGameplayStatics::ApplyPointDamage(DamageActor, ServerPrimaryWeapon->BaseDamage * 1, HitFromDirection, HitInfo, GetController(),
+						this, UDamageType::StaticClass());
+				}
+				break;
+		
+				case SurfaceType3:
+				{
+					//Arm
+					UGameplayStatics::ApplyPointDamage(DamageActor, ServerPrimaryWeapon->BaseDamage * 0.8, HitFromDirection, HitInfo, GetController(),
+						this, UDamageType::StaticClass());
+				}
+				break;
+		
+				case SurfaceType4:
+				{
+					//Leg
+					UGameplayStatics::ApplyPointDamage(DamageActor, ServerPrimaryWeapon->BaseDamage * 0.7, HitFromDirection, HitInfo, GetController(),
+						this, UDamageType::StaticClass());
+				}
+				break;
+			}
+	}
+
+}
+
+void AFPSCharacterBase::OnHit(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser)
+{
+	Health -= Damage;
+
+	//Temp
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("PlayerName : %s Health : %f"),*GetName(), Health));
 }
 
 void AFPSCharacterBase::StartWithKindOfWeapon()

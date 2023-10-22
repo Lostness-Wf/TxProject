@@ -85,7 +85,13 @@ private:
 	void RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
 	//玩家伤害应用
-	void DamagePlayer();
+	void DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo);
+
+	//受到应用伤害回调
+	UFUNCTION()
+	void OnHit(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
+
+	float Health;
 
 public:
 	//静步

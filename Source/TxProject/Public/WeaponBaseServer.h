@@ -79,6 +79,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* BullteDecalMaterial;
 
+	UPROPERTY(EditAnywhere)
+	float BaseDamage;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();
