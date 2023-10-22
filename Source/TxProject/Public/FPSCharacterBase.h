@@ -75,10 +75,14 @@ private:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//步枪射击
+	//开始射击
 	void FireWeaponPrimary();
+
 	//停止射击
 	void StopFirePrimary();
+
+	//步枪射线检测
+	void RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
 public:
 	//RPC网络同步

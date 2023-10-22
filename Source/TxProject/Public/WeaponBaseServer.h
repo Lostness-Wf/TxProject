@@ -73,6 +73,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* ServerTPBodysShootAnimMontage;
 
+	UPROPERTY(EditAnywhere)
+	float BulletDistance;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();

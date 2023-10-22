@@ -4,6 +4,7 @@
 #include "FPSCharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -112,7 +113,7 @@ void AFPSCharacterBase::FireWeaponPrimary()
 		ClientFire();
 
 		//Temp
-		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
+		//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
 	}
 
 }
@@ -120,6 +121,37 @@ void AFPSCharacterBase::FireWeaponPrimary()
 void AFPSCharacterBase::StopFirePrimary()
 {
 
+}
+
+void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	FVector EndLocation;
+	FVector CameraForwardVector = UKismetMathLibrary::GetForwardVector(CameraRotation);
+	TArray<AActor*> IgnoreArray;
+	IgnoreArray.Add(this);
+	FHitResult HitResult;
+
+	if (ServerPrimaryWeapon)
+	{
+		if (IsMoving)
+		{
+
+		}
+		else
+		{
+			EndLocation = CameraLocation + CameraForwardVector * ServerPrimaryWeapon->BulletDistance;
+		}
+	}
+
+	bool HitSuccess = UKismetSystemLibrary::LineTraceSingle(GetWorld(), CameraLocation, EndLocation, ETraceTypeQuery::TraceTypeQuery1, false, IgnoreArray,
+		EDrawDebugTrace::Persistent, HitResult, true, FLinearColor::Red, FLinearColor::Green, 3.f);
+
+	if (HitSuccess)
+	{
+		UKismetSystemLibrary::PrintString(GetWorld(), FString::Printf(TEXT("Hit actor name : %s"), *HitResult.GetActor()->GetName()));
+		//达到玩家应用伤害
+		//打到墙壁生成弹孔
+	}
 }
 
 void AFPSCharacterBase::StartWithKindOfWeapon()
@@ -220,8 +252,11 @@ void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocat
 		ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
 	}
 
+	//步枪射线检测
+	RifleLineTrace(CameraLocation, CameraRotation, IsMoving);
+
 	//Temp
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
+	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
 }
 
 bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
