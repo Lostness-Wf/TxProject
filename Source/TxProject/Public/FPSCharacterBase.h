@@ -85,33 +85,45 @@ private:
 	void RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
 public:
-	//RPC网络同步
+	//静步
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerLowSpeedWalkAction();
 	void ServerLowSpeedWalkAction_Implementation();
 	bool ServerLowSpeedWalkAction_Validation();
 
+	//静步还原
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerNormalSpeedWalkAction();
 	void ServerNormalSpeedWalkAction_Implementation();
 	bool ServerNormalSpeedWalkAction_Validation();
 
+	//服务器射击
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerFireRifleWeapon(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 	void ServerFireRifleWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 	bool ServerFireRifleWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
+	//服务器射击组播
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void MultiShooting();
 	void MultiShooting_Implementation();
-	void MultiShooting_Validation();
+	bool MultiShooting_Validation();
 
+	//生成弹孔组播
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MultiSpawnBulletDecall(FVector Location, FRotator Rotation);
+	void MultiSpawnBulletDecall_Implementation(FVector Location, FRotator Rotation);
+	bool MultiSpawnBulletDecall_Validation(FVector Location, FRotator Rotation);
+
+	//客户端装备武器
 	UFUNCTION(Client, Reliable)
 	void ClientEquipFPArmsPriamry();
 
+	//客户端开火
 	UFUNCTION(Client, Reliable)
 	void ClientFire();
 
+	//客户端更新子弹数量UI
 	UFUNCTION(Client, Reliable)
 	void ClientUpdateAmmoUI(int32 ClipCurrentAmmo, int32 GunCurrentAmmo);
 

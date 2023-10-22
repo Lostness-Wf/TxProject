@@ -76,6 +76,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float BulletDistance;
 
+	UPROPERTY(EditAnywhere)
+	UMaterialInterface* BullteDecalMaterial;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();

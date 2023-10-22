@@ -5,6 +5,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/DecalComponent.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -144,14 +146,30 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 	}
 
 	bool HitSuccess = UKismetSystemLibrary::LineTraceSingle(GetWorld(), CameraLocation, EndLocation, ETraceTypeQuery::TraceTypeQuery1, false, IgnoreArray,
-		EDrawDebugTrace::Persistent, HitResult, true, FLinearColor::Red, FLinearColor::Green, 3.f);
-
+		EDrawDebugTrace::None, HitResult, true, FLinearColor::Red, FLinearColor::Green, 3.f);
+	 
 	if (HitSuccess)
 	{
+		//Temp
 		UKismetSystemLibrary::PrintString(GetWorld(), FString::Printf(TEXT("Hit actor name : %s"), *HitResult.GetActor()->GetName()));
-		//达到玩家应用伤害
-		//打到墙壁生成弹孔
+
+		AFPSCharacterBase* FPSCharacter = Cast<AFPSCharacterBase>(HitResult.GetActor());
+
+		if (FPSCharacter)
+		{
+			//打到玩家应用伤害
+
+		}
+		else
+		{
+			FRotator XRotator =  UKismetMathLibrary::MakeRotFromX(HitResult.Normal);
+
+			//组播打到墙壁生成弹孔
+			MultiSpawnBulletDecall(HitResult.Location, XRotator);
+		}
+
 	}
+
 }
 
 void AFPSCharacterBase::StartWithKindOfWeapon()
@@ -276,6 +294,25 @@ void AFPSCharacterBase::MultiShooting_Implementation()
 }
 
 bool AFPSCharacterBase::MultiShooting_Validate()
+{
+	return true;
+}
+
+void AFPSCharacterBase::MultiSpawnBulletDecall_Implementation(FVector Location, FRotator Rotation)
+{
+	if (ServerPrimaryWeapon)
+	{
+		UDecalComponent* Decal =  UGameplayStatics::SpawnDecalAtLocation(GetWorld(), ServerPrimaryWeapon->BullteDecalMaterial, FVector(8, 8, 8),
+			Location, Rotation, 10);
+
+		if (Decal)
+		{
+			Decal->SetFadeScreenSize(0.001);
+		}
+	}
+}
+
+bool AFPSCharacterBase::MultiSpawnBulletDecall_Validate(FVector Location, FRotator Rotation)
 {
 	return true;
 }
