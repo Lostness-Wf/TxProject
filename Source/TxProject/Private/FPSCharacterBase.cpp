@@ -111,10 +111,14 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFPSCharacterBase::ResetRecoil()
 {
+	RecoilXCoordPerShoot = 0;
+
 	NewVerticalRecoilAmount = 0;
 	OldVerticalRecoilAmount = 0;
 	VerticalRecoilAmount = 0;
-	RecoilXCoordPerShoot = 0;
+	NewHorizontalRecoilAmount = 0;
+	OldHorizontalRecoilAmount = 0;
+	HorizontalRecoilAmount = 0;
 }
 
 void AFPSCharacterBase::AutoFire()
@@ -123,7 +127,14 @@ void AFPSCharacterBase::AutoFire()
 	if (ServerPrimaryWeapon->ClipCurrentAmmo)
 	{
 		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
-		ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
+		if (UKismetMathLibrary::VSize(GetVelocity()) > 0.1f)
+		{
+		ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), true);
+		}
+		else
+		{
+			ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
+		}
 
 		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
 		ClientFire();
@@ -145,7 +156,14 @@ void AFPSCharacterBase::FireWeaponPrimary()
 	if (ServerPrimaryWeapon->ClipCurrentAmmo)
 	{
 		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
-		ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
+		if (UKismetMathLibrary::VSize(GetVelocity()) > 0.1f)
+		{
+			ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), true);
+		}
+		else
+		{
+			ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
+		}
 
 		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
 		ClientFire();
@@ -186,7 +204,12 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 	{
 		if (IsMoving)
 		{
-
+			//跑打
+			FVector Vector = CameraLocation + CameraForwardVector * ServerPrimaryWeapon->BulletDistance;
+			float RandomX = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+			float RandomY = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+			float RandomZ = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+			EndLocation = FVector(Vector.X + RandomX, Vector.Y + RandomY, Vector.Z + RandomZ);
 		}
 		else
 		{

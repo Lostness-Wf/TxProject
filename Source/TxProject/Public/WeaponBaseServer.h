@@ -102,6 +102,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	UCurveFloat* HorizontalRecoilCurve;
 
+	//ÅÜ´òËæ»ú·¶Î§
+	UPROPERTY(EditAnywhere)
+	float MovingFireRandomRange;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();
