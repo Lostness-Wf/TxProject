@@ -52,9 +52,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//枪口火焰
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* MuzzleFlash;
 
+	//枪声
 	UPROPERTY(EditAnywhere)
 	USoundBase* FireSound;
 
@@ -76,17 +78,25 @@ public:
 	UPROPERTY(EditAnywhere)
 	float BulletDistance;
 
+	//弹孔贴花
 	UPROPERTY(EditAnywhere)
 	UMaterialInterface* BullteDecalMaterial;
 
+	//基础伤害
 	UPROPERTY(EditAnywhere)
 	float BaseDamage;
 
+	//是否为自动步枪（是否可连击）
 	UPROPERTY(EditAnywhere)
 	bool IsAutoGun;
 
+	//连击间隔
 	UPROPERTY(EditAnywhere)
 	float AutoFireRate;
+
+	//垂直后坐力曲线
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* VerticalRecoilCurve;
 
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();

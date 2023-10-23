@@ -109,6 +109,14 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 }
 
 
+void AFPSCharacterBase::ResetRecoil()
+{
+	NewVerticalRecoilAmount = 0;
+	OldVerticalRecoilAmount = 0;
+	VerticalRecoilAmount = 0;
+	RecoilXCoordPerShoot = 0;
+}
+
 void AFPSCharacterBase::AutoFire()
 {
 	//判断弹夹是否为空
@@ -120,6 +128,9 @@ void AFPSCharacterBase::AutoFire()
 		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
 		ClientFire();
 		
+		//后坐力
+		ClientRecoil();
+
 	}
 	else
 	{
@@ -139,6 +150,9 @@ void AFPSCharacterBase::FireWeaponPrimary()
 		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
 		ClientFire();
 
+		//后坐力
+		ClientRecoil();
+
 		//Temp
 		//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
 
@@ -154,6 +168,10 @@ void AFPSCharacterBase::StopFirePrimary()
 {
 	//关闭计时器
 	GetWorldTimerManager().ClearTimer(AutoFireTimerHandle);
+
+	//重置后座力
+	ResetRecoil();
+
 }
 
 void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
@@ -472,6 +490,34 @@ void AFPSCharacterBase::ClientUpdateHealthUI_Implementation(float NewHealth)
 	{
 		FPSPlayerController->UpdateHealthUI(NewHealth);
 	}
+}
+
+void AFPSCharacterBase::ClientRecoil_Implementation()
+{
+	UCurveFloat* VerticalRecoilCurve = nullptr;
+
+	if (ServerPrimaryWeapon)
+	{
+		VerticalRecoilCurve = ServerPrimaryWeapon->VerticalRecoilCurve;
+	}
+
+	RecoilXCoordPerShoot += 0.1;
+
+	if (VerticalRecoilCurve)
+	{
+		NewVerticalRecoilAmount = VerticalRecoilCurve->GetFloatValue(RecoilXCoordPerShoot);
+	}
+
+	VerticalRecoilAmount = NewVerticalRecoilAmount - OldVerticalRecoilAmount;
+
+	if (FPSPlayerController)
+	{
+		FRotator ControllerRotater = FPSPlayerController->GetControlRotation();
+		FPSPlayerController->SetControlRotation(FRotator(ControllerRotater.Pitch + VerticalRecoilAmount,
+			ControllerRotater.Yaw,ControllerRotater.Roll));
+	}
+
+	OldVerticalRecoilAmount = NewVerticalRecoilAmount;
 }
 
 void AFPSCharacterBase::MoveRight(float AxisValue)

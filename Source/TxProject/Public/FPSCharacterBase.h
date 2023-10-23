@@ -75,8 +75,15 @@ private:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//计时器句柄
+	//连击计时器句柄
 	FTimerHandle AutoFireTimerHandle;
+
+	//后坐力
+	float NewVerticalRecoilAmount;
+	float OldVerticalRecoilAmount;
+	float VerticalRecoilAmount;
+	float RecoilXCoordPerShoot;
+	void ResetRecoil();
 
 	//步枪连击
 	void AutoFire();
@@ -145,4 +152,8 @@ public:
 	//客户端更新血量UI
 	UFUNCTION(Client, Reliable)
 	void ClientUpdateHealthUI(float NewHealth);
+
+	//客户端射击后坐力旋转镜头
+	UFUNCTION(Client, Reliable)
+	void ClientRecoil();
 };
