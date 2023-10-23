@@ -226,7 +226,7 @@ void AFPSCharacterBase::OnHit(AActor* DamagedActor, float Damage, class AControl
 	Health -= Damage;
 
 	//Temp
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("PlayerName : %s Health : %f"),*GetName(), Health));
+	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("PlayerName : %s Health : %f"),*GetName(), Health));
 }
 
 void AFPSCharacterBase::StartWithKindOfWeapon()
