@@ -136,4 +136,7 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientUpdateAmmoUI(int32 ClipCurrentAmmo, int32 GunCurrentAmmo);
 
+	//客户端更新血量UI
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateHealthUI(float NewHealth);
 };

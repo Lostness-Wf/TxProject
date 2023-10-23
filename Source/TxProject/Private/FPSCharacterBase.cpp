@@ -225,8 +225,16 @@ void AFPSCharacterBase::OnHit(AActor* DamagedActor, float Damage, class AControl
 {
 	Health -= Damage;
 
+	ClientUpdateHealthUI(Health);
+
+	if (Health <= 0)
+	{
+		//½ÇÉ«ËÀÍö
+	}
+
 	//Temp
 	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("PlayerName : %s Health : %f"),*GetName(), Health));
+
 }
 
 void AFPSCharacterBase::StartWithKindOfWeapon()
@@ -430,6 +438,14 @@ void AFPSCharacterBase::ClientUpdateAmmoUI_Implementation(int32 ClipCurrentAmmo,
 	if (FPSPlayerController)
 	{
 		FPSPlayerController->UpdateAmmoUI(ClipCurrentAmmo, GunCurrentAmmo);
+	}
+}
+
+void AFPSCharacterBase::ClientUpdateHealthUI_Implementation(float NewHealth)
+{
+	if (FPSPlayerController)
+	{
+		FPSPlayerController->UpdateHealthUI(NewHealth);
 	}
 }
 
