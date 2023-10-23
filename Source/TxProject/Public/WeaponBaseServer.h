@@ -98,6 +98,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	UCurveFloat* VerticalRecoilCurve;
 
+	//垂直后坐力曲线
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* HorizontalRecoilCurve;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();

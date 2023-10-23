@@ -78,12 +78,21 @@ private:
 	//连击计时器句柄
 	FTimerHandle AutoFireTimerHandle;
 
-	//后坐力
+	//后坐曲线X坐标
+	float RecoilXCoordPerShoot;
+
+	//重置后坐
+	void ResetRecoil();
+
+	//垂直后坐
 	float NewVerticalRecoilAmount;
 	float OldVerticalRecoilAmount;
 	float VerticalRecoilAmount;
-	float RecoilXCoordPerShoot;
-	void ResetRecoil();
+
+	//水平后坐
+	float NewHorizontalRecoilAmount;
+	float OldHorizontalRecoilAmount;
+	float HorizontalRecoilAmount;
 
 	//步枪连击
 	void AutoFire();

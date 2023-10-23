@@ -495,10 +495,12 @@ void AFPSCharacterBase::ClientUpdateHealthUI_Implementation(float NewHealth)
 void AFPSCharacterBase::ClientRecoil_Implementation()
 {
 	UCurveFloat* VerticalRecoilCurve = nullptr;
+	UCurveFloat* HorizontalRecoilCurve = nullptr;
 
 	if (ServerPrimaryWeapon)
 	{
 		VerticalRecoilCurve = ServerPrimaryWeapon->VerticalRecoilCurve;
+		HorizontalRecoilCurve = ServerPrimaryWeapon->HorizontalRecoilCurve;
 	}
 
 	RecoilXCoordPerShoot += 0.1;
@@ -508,16 +510,23 @@ void AFPSCharacterBase::ClientRecoil_Implementation()
 		NewVerticalRecoilAmount = VerticalRecoilCurve->GetFloatValue(RecoilXCoordPerShoot);
 	}
 
+	if (HorizontalRecoilCurve)
+	{
+		NewHorizontalRecoilAmount = HorizontalRecoilCurve->GetFloatValue(RecoilXCoordPerShoot);
+	}
+
 	VerticalRecoilAmount = NewVerticalRecoilAmount - OldVerticalRecoilAmount;
+	HorizontalRecoilAmount = NewHorizontalRecoilAmount - OldHorizontalRecoilAmount;
 
 	if (FPSPlayerController)
 	{
 		FRotator ControllerRotater = FPSPlayerController->GetControlRotation();
 		FPSPlayerController->SetControlRotation(FRotator(ControllerRotater.Pitch + VerticalRecoilAmount,
-			ControllerRotater.Yaw,ControllerRotater.Roll));
+			ControllerRotater.Yaw + HorizontalRecoilAmount,ControllerRotater.Roll));
 	}
 
 	OldVerticalRecoilAmount = NewVerticalRecoilAmount;
+	OldHorizontalRecoilAmount = NewHorizontalRecoilAmount;
 }
 
 void AFPSCharacterBase::MoveRight(float AxisValue)
