@@ -9,6 +9,7 @@
 #include "Components/DecalComponent.h"
 #include "GameFramework/Actor.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -57,6 +58,16 @@ void AFPSCharacterBase::BeginPlay()
 	{
 		FPSPlayerController->CreatPlayerUI();
 	}
+
+	IsFiring = false;
+	IsReloading = false;
+}
+
+void AFPSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(AFPSCharacterBase, IsFiring, COND_None);
+	DOREPLIFETIME_CONDITION(AFPSCharacterBase, IsReloading, COND_None);
 }
 
 void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
@@ -106,6 +117,8 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	InputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AFPSCharacterBase::InputFirePressed);
 	InputComponent->BindAction(TEXT("Fire"), IE_Released, this, &AFPSCharacterBase::InputFireReleased);
+
+	InputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AFPSCharacterBase::InputReload);
 }
 
 
@@ -129,7 +142,7 @@ void AFPSCharacterBase::AutoFire()
 		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
 		if (UKismetMathLibrary::VSize(GetVelocity()) > 0.1f)
 		{
-		ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), true);
+			ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), true);
 		}
 		else
 		{
@@ -184,6 +197,9 @@ void AFPSCharacterBase::FireWeaponPrimary()
 
 void AFPSCharacterBase::StopFirePrimary()
 {
+	//更改IsFire
+	ServerStopFiring();
+
 	//关闭计时器
 	GetWorldTimerManager().ClearTimer(AutoFireTimerHandle);
 
@@ -401,6 +417,8 @@ void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocat
 		ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
 	}
 
+	IsFiring = true;
+
 	//步枪射线检测
 	RifleLineTrace(CameraLocation, CameraRotation, IsMoving);
 
@@ -409,6 +427,27 @@ void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocat
 }
 
 bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	return true;
+}
+
+void AFPSCharacterBase::ServerReloadPrimary_Implementation()
+{
+	//服务器身体多播动画，客户端手臂，子弹， UI
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerReload")));
+}
+
+bool AFPSCharacterBase::ServerReloadPrimary_Validate()
+{
+	return true;
+}
+
+void AFPSCharacterBase::ServerStopFiring_Implementation()
+{
+	IsFiring = false;
+}
+
+bool AFPSCharacterBase::ServerStopFiring_Validate()
 {
 	return true;
 }
@@ -627,5 +666,27 @@ void AFPSCharacterBase::InputFireReleased()
 
 		default:
 		break;
+	}
+}
+
+void AFPSCharacterBase::InputReload()
+{
+
+	if (!IsReloading)
+	{
+		if (!IsFiring)
+		{
+			switch (ActiveWeapon)
+			{
+			case EWeaponType::AK47:
+				{
+					ServerReloadPrimary();
+				}
+			case EWeaponType::DesertEagle:
+				break;
+			default:
+				break;
+			}
+		}
 	}
 }

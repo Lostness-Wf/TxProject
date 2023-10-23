@@ -49,6 +49,8 @@ protected:
 	void InputFirePressed();
 	void InputFireReleased();
 
+	void InputReload();
+
 public:
 	void EquipPrimary(AWeaponBaseServer* WeaponBaseServer);
 
@@ -94,6 +96,14 @@ private:
 	float OldHorizontalRecoilAmount;
 	float HorizontalRecoilAmount;
 
+	//是否在射击
+	UPROPERTY(Replicated)
+	bool IsFiring;
+
+	//是否在换弹
+	UPROPERTY(Replicated)
+	bool IsReloading;
+
 	//步枪连击
 	void AutoFire();
 
@@ -134,7 +144,19 @@ public:
 	void ServerFireRifleWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 	bool ServerFireRifleWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
-	//服务器射击组播
+	//服务器换弹
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerReloadPrimary();
+	void ServerReloadPrimary_Implementation();
+	bool ServerReloadPrimary_Validation();
+
+	//停止射击
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerStopFiring();
+	void ServerStopFiring_Implementation();
+	bool ServerStopFiring_Validation();
+
+	//射击组播
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void MultiShooting();
 	void MultiShooting_Implementation();
