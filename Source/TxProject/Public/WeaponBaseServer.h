@@ -82,6 +82,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	float BaseDamage;
 
+	UPROPERTY(EditAnywhere)
+	bool IsAutoGun;
+
+	UPROPERTY(EditAnywhere)
+	float AutoFireRate;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();

@@ -109,6 +109,25 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 }
 
 
+void AFPSCharacterBase::AutoFire()
+{
+	//判断弹夹是否为空
+	if (ServerPrimaryWeapon->ClipCurrentAmmo)
+	{
+		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
+		ServerFireRifleWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
+
+		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
+		ClientFire();
+		
+	}
+	else
+	{
+		//没子弹关闭计时器
+		GetWorldTimerManager().ClearTimer(AutoFireTimerHandle);
+	}
+}
+
 void AFPSCharacterBase::FireWeaponPrimary()
 {
 	//判断弹夹是否为空
@@ -122,13 +141,19 @@ void AFPSCharacterBase::FireWeaponPrimary()
 
 		//Temp
 		//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerPrimaryWeapon->ClipCurrentAmmo : %d"), ServerPrimaryWeapon->ClipCurrentAmmo));
-	}
 
+		if (ServerPrimaryWeapon->IsAutoGun)
+		{
+			//开始计时器
+			GetWorldTimerManager().SetTimer(AutoFireTimerHandle, this, &AFPSCharacterBase::AutoFire, ServerPrimaryWeapon->AutoFireRate, true);
+		}
+	}
 }
 
 void AFPSCharacterBase::StopFirePrimary()
 {
-
+	//关闭计时器
+	GetWorldTimerManager().ClearTimer(AutoFireTimerHandle);
 }
 
 void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)

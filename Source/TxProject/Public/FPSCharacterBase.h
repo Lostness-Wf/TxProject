@@ -75,10 +75,16 @@ private:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//开始射击
+	//计时器句柄
+	FTimerHandle AutoFireTimerHandle;
+
+	//步枪连击
+	void AutoFire();
+
+	//步枪开始射击
 	void FireWeaponPrimary();
 
-	//停止射击
+	//步枪停止射击
 	void StopFirePrimary();
 
 	//步枪射线检测
