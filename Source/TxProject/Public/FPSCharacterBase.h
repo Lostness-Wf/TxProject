@@ -187,4 +187,7 @@ public:
 	//客户端射击后坐力旋转镜头
 	UFUNCTION(Client, Reliable)
 	void ClientRecoil();
+
+	UFUNCTION(Client, Reliable)
+	void ClientReload();
 };

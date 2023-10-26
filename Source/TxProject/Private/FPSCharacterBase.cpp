@@ -433,8 +433,11 @@ bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, F
 
 void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 {
-	//服务器身体多播动画，客户端手臂，子弹， UI
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerReload")));
+	//服务器身体多播动画
+	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerReload")));
+
+	//客户端手臂Reload动画
+	ClientReload();
 }
 
 bool AFPSCharacterBase::ServerReloadPrimary_Validate()
@@ -517,7 +520,7 @@ void AFPSCharacterBase::ClientFire_Implementation()
 	AWeaponBaseClient* CurrentWeapon = GetCurrentClientFPArmsWeaponActor();
 	if (ClientPrimaryWeapon)
 	{
-		//播放枪支设计动画
+		//播放枪支射击动画
 		CurrentWeapon->PlayShootAnimation();
 
 		//射击手臂动画
@@ -589,6 +592,19 @@ void AFPSCharacterBase::ClientRecoil_Implementation()
 
 	OldVerticalRecoilAmount = NewVerticalRecoilAmount;
 	OldHorizontalRecoilAmount = NewHorizontalRecoilAmount;
+}
+
+void AFPSCharacterBase::ClientReload_Implementation()
+{
+	//客户端手臂Reload动画
+	AWeaponBaseClient* CurrentClientWeapon = GetCurrentClientFPArmsWeaponActor();
+	if (CurrentClientWeapon)
+	{
+		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ClientReload")));
+		UAnimMontage* ClientArmsFireMontage = CurrentClientWeapon->ClientArmsReloadMontage;
+		ClientArmsAnimBP->Montage_Play(ClientArmsFireMontage);
+		CurrentClientWeapon->PlayReloadAnimation();
+	}
 }
 
 void AFPSCharacterBase::MoveRight(float AxisValue)

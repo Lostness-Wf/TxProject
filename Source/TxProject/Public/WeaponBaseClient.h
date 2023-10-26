@@ -22,6 +22,9 @@ public:
 	UAnimMontage* ClientArmsFireMontage;
 
 	UPROPERTY(EditAnywhere)
+	UAnimMontage* ClientArmsReloadMontage;
+
+	UPROPERTY(EditAnywhere)
 	USoundBase* FireSound;
 
 	UPROPERTY(EditAnywhere)
@@ -40,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "FPGunAnimation")
 	void PlayShootAnimation();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "FPGunAnimation")
+	void PlayReloadAnimation();
 
 	//Éä»÷ÉùÒô£¬Á£×Ó
 	void DisplayWeaponEffect();
