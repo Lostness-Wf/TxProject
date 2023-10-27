@@ -380,6 +380,27 @@ AWeaponBaseClient* AFPSCharacterBase::GetCurrentClientFPArmsWeaponActor()
 	}
 }
 
+AWeaponBaseServer* AFPSCharacterBase::GetCurrentServerTPBodysWeaponActor()
+{
+	switch (ActiveWeapon)
+	{
+	case EWeaponType::None:
+		return nullptr;
+		break;
+	case EWeaponType::AK47:
+	{
+		return ServerPrimaryWeapon;
+	}
+	break;
+	case EWeaponType::DesertEagle:
+		return nullptr;
+		break;
+	default:
+		return nullptr;
+		break;
+	}
+}
+
 void AFPSCharacterBase::ServerLowSpeedWalkAction_Implementation()
 {
 	this->GetCharacterMovement()->MaxWalkSpeed = 300;
@@ -433,11 +454,11 @@ bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, F
 
 void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 {
-	//服务器身体多播动画
-	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ServerReload")));
-
 	//客户端手臂Reload动画
 	ClientReload();
+
+	//服务器身体多播换弹动画
+	MultiReload();
 }
 
 bool AFPSCharacterBase::ServerReloadPrimary_Validate()
@@ -486,6 +507,25 @@ void AFPSCharacterBase::MultiSpawnBulletDecall_Implementation(FVector Location, 
 }
 
 bool AFPSCharacterBase::MultiSpawnBulletDecall_Validate(FVector Location, FRotator Rotation)
+{
+	return true;
+}
+
+void AFPSCharacterBase::MultiReload_Implementation()
+{
+	//第三人称身体换弹动画组播
+	AWeaponBaseServer* CurrentSererWeapon = GetCurrentServerTPBodysWeaponActor();
+
+	if (ServerBodysAnimBP)
+	{
+		if (CurrentSererWeapon)
+		{
+			ServerBodysAnimBP->Montage_Play(CurrentSererWeapon->ServerTPBodysReloadAnimMontage);
+		}
+	}
+}
+
+bool AFPSCharacterBase::MultiReload_Validate()
 {
 	return true;
 }

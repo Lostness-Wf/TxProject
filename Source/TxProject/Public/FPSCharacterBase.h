@@ -70,6 +70,7 @@ private:
 	void PurchaseWeapon(EWeaponType WeaponType);
 	
 	AWeaponBaseClient* GetCurrentClientFPArmsWeaponActor();
+	AWeaponBaseServer* GetCurrentServerTPBodysWeaponActor();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -167,6 +168,12 @@ public:
 	void MultiSpawnBulletDecall(FVector Location, FRotator Rotation);
 	void MultiSpawnBulletDecall_Implementation(FVector Location, FRotator Rotation);
 	bool MultiSpawnBulletDecall_Validation(FVector Location, FRotator Rotation);
+
+	//第三人称身体换弹动画组播
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MultiReload();
+	void MultiReload_Implementation();
+	void MultiReload_Validation();
 
 	//客户端装备武器
 	UFUNCTION(Client, Reliable)
