@@ -134,6 +134,11 @@ void AFPSCharacterBase::ResetRecoil()
 	HorizontalRecoilAmount = 0;
 }
 
+void AFPSCharacterBase::DelayPlayArmReloadCallBack()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ReloadCallBack"));
+}
+
 void AFPSCharacterBase::AutoFire()
 {
 	//判断弹夹是否为空
@@ -239,7 +244,7 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 	if (HitSuccess)
 	{
 		//Temp
-		UKismetSystemLibrary::PrintString(GetWorld(), FString::Printf(TEXT("Hit actor name : %s"), *HitResult.GetActor()->GetName()));
+		//UKismetSystemLibrary::PrintString(GetWorld(), FString::Printf(TEXT("Hit actor name : %s"), *HitResult.GetActor()->GetName()));
 
 		AFPSCharacterBase* FPSCharacter = Cast<AFPSCharacterBase>(HitResult.GetActor());
 
@@ -454,11 +459,25 @@ bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, F
 
 void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 {
-	//客户端手臂Reload动画
-	ClientReload();
+	//判断弹夹未满而且还有备弹
+	if (ServerPrimaryWeapon->ClipCurrentAmmo < ServerPrimaryWeapon->MaxClipAmmo && ServerPrimaryWeapon->GunCurrentAmmo > 0)
+	{
+		//客户端手臂Reload动画
+		ClientReload();
+	
+		//服务器身体多播换弹动画
+		MultiReload();
 
-	//服务器身体多播换弹动画
-	MultiReload();
+		if (ClientPrimaryWeapon)
+		{
+			FLatentActionInfo ActionInfo;
+			ActionInfo.CallbackTarget = this;
+			ActionInfo.ExecutionFunction = TEXT("DelayPlayArmReloadCallBack");
+			ActionInfo.UUID = FMath::Rand();
+			ActionInfo.Linkage = 0;
+			UKismetSystemLibrary::Delay(this, ClientPrimaryWeapon->ClientArmsReloadMontage->GetPlayLength(), ActionInfo);
+		}
+	}
 }
 
 bool AFPSCharacterBase::ServerReloadPrimary_Validate()
@@ -640,7 +659,8 @@ void AFPSCharacterBase::ClientReload_Implementation()
 	AWeaponBaseClient* CurrentClientWeapon = GetCurrentClientFPArmsWeaponActor();
 	if (CurrentClientWeapon)
 	{
-		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ClientReload")));
+		//Temp
+		//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ClientReload")));
 		UAnimMontage* ClientArmsFireMontage = CurrentClientWeapon->ClientArmsReloadMontage;
 		ClientArmsAnimBP->Montage_Play(ClientArmsFireMontage);
 		CurrentClientWeapon->PlayReloadAnimation();

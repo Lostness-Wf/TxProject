@@ -105,6 +105,10 @@ private:
 	UPROPERTY(Replicated)
 	bool IsReloading;
 
+	//换弹结束回调函数
+	UFUNCTION()
+	void DelayPlayArmReloadCallBack();
+
 	//步枪连击
 	void AutoFire();
 
