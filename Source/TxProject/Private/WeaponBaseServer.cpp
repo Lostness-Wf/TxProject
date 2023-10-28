@@ -35,11 +35,18 @@ AWeaponBaseServer::AWeaponBaseServer()
 
 void AWeaponBaseServer::OnOtherBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AFPSCharacterBase* FSPCharacter = Cast<AFPSCharacterBase>(OtherActor);
-	if (FSPCharacter)
+	AFPSCharacterBase* FPSCharacter = Cast<AFPSCharacterBase>(OtherActor);
+	if (FPSCharacter)
 	{
 		EquipWeapon();
-		FSPCharacter->EquipPrimary(this);
+		if (KindOfWeapon == EWeaponType::DesertEagle)
+		{
+			FPSCharacter->EquipSrcondary(this);
+		}
+		else
+		{
+		FPSCharacter->EquipPrimary(this);
+		}
 	}
 }
 

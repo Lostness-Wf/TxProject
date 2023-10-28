@@ -92,6 +92,27 @@ void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
 	}
 }
 
+void AFPSCharacterBase::EquipSrcondary(AWeaponBaseServer* WeaponBaseServer)
+{
+	if (ServerSecondaryWeapon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Weapon already exist"))
+	}
+	else
+	{
+		ServerSecondaryWeapon = WeaponBaseServer;
+		ServerSecondaryWeapon->SetOwner(this);
+		ServerSecondaryWeapon->K2_AttachToComponent(GetMesh(), TEXT("Weapon_Right"),
+			EAttachmentRule::SnapToTarget,
+			EAttachmentRule::SnapToTarget,
+			EAttachmentRule::SnapToTarget,
+			true);
+		ClientEquipFPArmsSecondary();
+
+		ClientUpdateAmmoUI(ServerSecondaryWeapon->ClipCurrentAmmo, ServerSecondaryWeapon->GunCurrentAmmo);
+	}
+}
+
 // Called every frame
 void AFPSCharacterBase::Tick(float DeltaTime)
 {
@@ -392,17 +413,22 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 			break;
 
 		case EWeaponType::MP7:
-		{
-			UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/MP7/BP_MP7_Server.BP_MP7_Server_C'"));
-			AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
-			ServerWeapon->EquipWeapon();
-			ActiveWeapon = EWeaponType::MP7;
-			EquipPrimary(ServerWeapon);
-		}
-		break;
+			{
+				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/MP7/BP_MP7_Server.BP_MP7_Server_C'"));
+				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+				ServerWeapon->EquipWeapon();
+				ActiveWeapon = EWeaponType::MP7;
+				EquipPrimary(ServerWeapon);
+			}
+			break;
 
 		case EWeaponType::DesertEagle:
 			{
+				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/DesertEagle/BP_DesertEagle_Server.BP_DesertEagle_Server_C'"));
+				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+				ServerWeapon->EquipWeapon();
+				ActiveWeapon = EWeaponType::DesertEagle;
+				EquipSrcondary(ServerWeapon);
 			}
 			break;
 
@@ -651,6 +677,40 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 		if (ClientPrimaryWeapon)
 		{
 			UpdateFPArmsBlendPose(ClientPrimaryWeapon->FPArmsBlendPose);
+		}
+	}
+}
+
+void AFPSCharacterBase::ClientEquipFPArmsSecondary_Implementation()
+{
+	if (ServerSecondaryWeapon)
+	{
+		if (ClientSecondaryWeapon)
+		{
+
+		}
+		else
+		{
+			FActorSpawnParameters SpawnInfo;
+			SpawnInfo.Owner = this;
+			SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			ClientSecondaryWeapon = GetWorld()->SpawnActor<AWeaponBaseClient>(ServerSecondaryWeapon->ClientWeaponBaseBPClass,
+				GetActorTransform(),
+				SpawnInfo);
+
+			FName WeaponSocketName = TEXT("WeaponSocket");
+
+			ClientSecondaryWeapon->K2_AttachToComponent(FPArmsMesh, WeaponSocketName,
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::SnapToTarget,
+				true);
+		}
+
+		//第一人称手臂持枪动画
+		if (ClientSecondaryWeapon)
+		{
+			UpdateFPArmsBlendPose(ClientSecondaryWeapon->FPArmsBlendPose);
 		}
 	}
 }

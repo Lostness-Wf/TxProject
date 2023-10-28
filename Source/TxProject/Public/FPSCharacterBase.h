@@ -58,6 +58,8 @@ protected:
 public:
 	void EquipPrimary(AWeaponBaseServer* WeaponBaseServer);
 
+	void EquipSrcondary(AWeaponBaseServer* WeaponBaseServer);
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateFPArmsBlendPose(int NewIndex);
 
@@ -67,6 +69,12 @@ private:
 
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AWeaponBaseClient* ClientPrimaryWeapon;
+
+	UPROPERTY(meta = (AllowPrivateAccess = "true"))
+	AWeaponBaseServer* ServerSecondaryWeapon;
+
+	UPROPERTY(meta = (AllowPrivateAccess = "true"))
+	AWeaponBaseClient* ClientSecondaryWeapon;
 
 	UPROPERTY(meta = (AllowPrivateAccess = "true"), Replicated)
 	EWeaponType ActiveWeapon;
@@ -186,9 +194,13 @@ public:
 	void MultiReload_Implementation();
 	void MultiReload_Validation();
 
-	//客户端装备武器
+	//客户端装备主武器
 	UFUNCTION(Client, Reliable)
 	void ClientEquipFPArmsPriamry();
+
+	//客户端装备副武器
+	UFUNCTION(Client, Reliable)
+	void ClientEquipFPArmsSecondary();
 
 	//客户端开火
 	UFUNCTION(Client, Reliable)
