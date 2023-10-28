@@ -35,6 +35,10 @@ private:
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	AMultiFPSPlayerController* FPSPlayerController;
 
+	//Temp
+	UPROPERTY(EditAnywhere)
+	EWeaponType TestStartWeapon;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -54,6 +58,9 @@ protected:
 public:
 	void EquipPrimary(AWeaponBaseServer* WeaponBaseServer);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateFPArmsBlendPose(int NewIndex);
+
 private:
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AWeaponBaseServer* ServerPrimaryWeapon;
@@ -61,7 +68,7 @@ private:
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AWeaponBaseClient* ClientPrimaryWeapon;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Test")  //Temp
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Replicated)
 	EWeaponType ActiveWeapon;
 
 	//³õÊ¼×Ô´øÎäÆ÷

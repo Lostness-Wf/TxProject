@@ -68,6 +68,7 @@ void AFPSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(AFPSCharacterBase, IsFiring, COND_None);
 	DOREPLIFETIME_CONDITION(AFPSCharacterBase, IsReloading, COND_None);
+	DOREPLIFETIME_CONDITION(AFPSCharacterBase, ActiveWeapon, COND_None);
 }
 
 void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
@@ -353,7 +354,7 @@ void AFPSCharacterBase::StartWithKindOfWeapon()
 {
 	if (HasAuthority())
 	{
-		PurchaseWeapon(EWeaponType::AK47);
+		PurchaseWeapon(TestStartWeapon);
 	}
 }
 
@@ -361,7 +362,7 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Owner = this;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;	
 
 	switch (WeaponType)
 	{
@@ -372,10 +373,22 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 
 	case EWeaponType::AK47:
 		{
-		UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C'"));
-		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
-		ServerWeapon->EquipWeapon();
-		EquipPrimary(ServerWeapon);
+			UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C'"));
+			AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+			ServerWeapon->EquipWeapon();
+			ActiveWeapon = EWeaponType::AK47;
+			EquipPrimary(ServerWeapon);
+		}
+		break;
+
+	case EWeaponType::M4A1:
+		{
+			//M4A1蓝图路径
+			UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/M4A1/BP_M4A1_Server.BP_M4A1_Server_C'"));
+			AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+			ServerWeapon->EquipWeapon();
+			ActiveWeapon = EWeaponType::M4A1;
+			EquipPrimary(ServerWeapon);
 		}
 		break;
 
@@ -590,11 +603,24 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 			ClientPrimaryWeapon = GetWorld()->SpawnActor<AWeaponBaseClient>(ServerPrimaryWeapon->ClientWeaponBaseBPClass,
 				GetActorTransform(),
 				SpawnInfo);
-			ClientPrimaryWeapon->K2_AttachToComponent(FPArmsMesh, TEXT("WeaponSocket"),
+			
+			FName WeaponSocketName = TEXT("WeaponSocket");
+			if (ActiveWeapon == EWeaponType::M4A1)
+			{
+				WeaponSocketName = TEXT("M4A1_Socket");
+			}
+
+			ClientPrimaryWeapon->K2_AttachToComponent(FPArmsMesh, WeaponSocketName,
 				EAttachmentRule::SnapToTarget,
 				EAttachmentRule::SnapToTarget,
 				EAttachmentRule::SnapToTarget,
 				true);
+		}
+
+		//第一人称手臂持枪动画
+		if (ClientPrimaryWeapon)
+		{
+			UpdateFPArmsBlendPose(ClientPrimaryWeapon->FPArmsBlendPose);
 		}
 	}
 }

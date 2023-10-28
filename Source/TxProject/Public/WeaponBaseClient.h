@@ -33,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UCameraShakeBase> CameraShakeClass;
 
+	UPROPERTY(EditAnywhere)
+	int FPArmsBlendPose;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
