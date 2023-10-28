@@ -124,19 +124,42 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFPSCharacterBase::ResetRecoil()
 {
-	RecoilXCoordPerShoot = 0;
+	RecoilXCoordPerShoot	  = 0;
 
-	NewVerticalRecoilAmount = 0;
-	OldVerticalRecoilAmount = 0;
-	VerticalRecoilAmount = 0;
+	NewVerticalRecoilAmount   = 0;
+	OldVerticalRecoilAmount   = 0;
+	VerticalRecoilAmount	  = 0;
 	NewHorizontalRecoilAmount = 0;
 	OldHorizontalRecoilAmount = 0;
-	HorizontalRecoilAmount = 0;
+	HorizontalRecoilAmount	  = 0;
 }
 
 void AFPSCharacterBase::DelayPlayArmReloadCallBack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ReloadCallBack"));
+	//Temp
+	//UE_LOG(LogTemp, Warning, TEXT("ReloadCallBack"));
+
+	int32 GunCurrentAmmo = ServerPrimaryWeapon->GunCurrentAmmo;
+	int32 CLipCurrentAmmo = ServerPrimaryWeapon->ClipCurrentAmmo;
+	int32 const MaxClipAmmo = ServerPrimaryWeapon->MaxClipAmmo;
+
+	//备弹数小于所需装填子弹，剩余备弹全部装填
+	if (MaxClipAmmo - CLipCurrentAmmo >= GunCurrentAmmo)
+	{
+		CLipCurrentAmmo += GunCurrentAmmo;
+		GunCurrentAmmo = 0;
+	}
+	//备弹数大于装填所需子弹
+	else
+	{
+		GunCurrentAmmo -= MaxClipAmmo - CLipCurrentAmmo;
+		CLipCurrentAmmo = MaxClipAmmo;
+	}
+
+	ServerPrimaryWeapon->GunCurrentAmmo = GunCurrentAmmo;
+	ServerPrimaryWeapon->ClipCurrentAmmo = CLipCurrentAmmo;
+
+	ClientUpdateAmmoUI(CLipCurrentAmmo, GunCurrentAmmo);
 }
 
 void AFPSCharacterBase::AutoFire()
