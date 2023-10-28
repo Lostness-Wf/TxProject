@@ -366,39 +366,48 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 
 	switch (WeaponType)
 	{
-	case EWeaponType::None:
-		{
-		}
-		break;
+		case EWeaponType::None:
+			{
+			}
+			break;
 
-	case EWeaponType::AK47:
+		case EWeaponType::AK47:
+			{
+				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C'"));
+				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+				ServerWeapon->EquipWeapon();
+				ActiveWeapon = EWeaponType::AK47;
+				EquipPrimary(ServerWeapon);
+			}
+			break;
+
+		case EWeaponType::M4A1:
+			{
+				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/M4A1/BP_M4A1_Server.BP_M4A1_Server_C'"));
+				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+				ServerWeapon->EquipWeapon();
+				ActiveWeapon = EWeaponType::M4A1;
+				EquipPrimary(ServerWeapon);
+			}
+			break;
+
+		case EWeaponType::MP7:
 		{
-			UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C'"));
+			UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/MP7/BP_MP7_Server.BP_MP7_Server_C'"));
 			AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 			ServerWeapon->EquipWeapon();
-			ActiveWeapon = EWeaponType::AK47;
+			ActiveWeapon = EWeaponType::MP7;
 			EquipPrimary(ServerWeapon);
 		}
 		break;
 
-	case EWeaponType::M4A1:
-		{
-			//M4A1À¶Í¼Â·¾¶
-			UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/M4A1/BP_M4A1_Server.BP_M4A1_Server_C'"));
-			AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
-			ServerWeapon->EquipWeapon();
-			ActiveWeapon = EWeaponType::M4A1;
-			EquipPrimary(ServerWeapon);
-		}
-		break;
+		case EWeaponType::DesertEagle:
+			{
+			}
+			break;
 
-	case EWeaponType::DesertEagle:
-		{
-		}
-		break;
-
-	default:
-		break;
+		default:
+			break;
 	}
 }
 
@@ -418,6 +427,12 @@ AWeaponBaseClient* AFPSCharacterBase::GetCurrentClientFPArmsWeaponActor()
 		}
 		break;
 
+		case EWeaponType::MP7:
+		{
+			return ClientPrimaryWeapon;
+		}
+		break;
+
 		case EWeaponType::DesertEagle:
 			return nullptr;
 			break;
@@ -431,27 +446,31 @@ AWeaponBaseServer* AFPSCharacterBase::GetCurrentServerTPBodysWeaponActor()
 {
 	switch (ActiveWeapon)
 	{
-	case EWeaponType::None:
-		return nullptr;
-		break;
-	case EWeaponType::AK47:
-	{
-		return ServerPrimaryWeapon;
-	}
-	break;
 
-	case EWeaponType::M4A1:
-	{
-		return ServerPrimaryWeapon;
-	}
-	break;
+		case EWeaponType::AK47:
+		{
+			return ServerPrimaryWeapon;
+		}
+		break;
 
-	case EWeaponType::DesertEagle:
-		return nullptr;
+		case EWeaponType::M4A1:
+		{
+			return ServerPrimaryWeapon;
+		}
 		break;
-	default:
-		return nullptr;
+
+		case EWeaponType::MP7:
+		{
+			return ServerPrimaryWeapon;
+		}
 		break;
+
+		case EWeaponType::DesertEagle:
+			return nullptr;
+			break;
+		default:
+			return nullptr;
+			break;
 	}
 }
 

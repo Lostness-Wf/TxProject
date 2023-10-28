@@ -68,7 +68,7 @@ private:
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AWeaponBaseClient* ClientPrimaryWeapon;
 
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"), Replicated)
+	UPROPERTY(meta = (AllowPrivateAccess = "true"), Replicated)
 	EWeaponType ActiveWeapon;
 
 	//³õÊ¼×Ô´øÎäÆ÷
