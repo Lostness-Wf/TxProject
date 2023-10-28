@@ -564,7 +564,7 @@ void AFPSCharacterBase::MultiSpawnBulletDecall_Implementation(FVector Location, 
 {
 	if (ServerPrimaryWeapon)
 	{
-		UDecalComponent* Decal =  UGameplayStatics::SpawnDecalAtLocation(GetWorld(), ServerPrimaryWeapon->BullteDecalMaterial, FVector(8, 8, 8),
+		UDecalComponent* Decal =  UGameplayStatics::SpawnDecalAtLocation(GetWorld(), ServerPrimaryWeapon->BullteDecalMaterial, FVector(5, 5, 5),
 			Location, Rotation, 10);
 
 		if (Decal)
