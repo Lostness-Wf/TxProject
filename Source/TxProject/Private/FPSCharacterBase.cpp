@@ -143,6 +143,8 @@ void AFPSCharacterBase::DelayPlayArmReloadCallBack()
 	int32 CLipCurrentAmmo = ServerPrimaryWeapon->ClipCurrentAmmo;
 	int32 const MaxClipAmmo = ServerPrimaryWeapon->MaxClipAmmo;
 
+	IsReloading = false;
+
 	//备弹数小于所需装填子弹，剩余备弹全部装填
 	if (MaxClipAmmo - CLipCurrentAmmo >= GunCurrentAmmo)
 	{
@@ -194,7 +196,7 @@ void AFPSCharacterBase::AutoFire()
 void AFPSCharacterBase::FireWeaponPrimary()
 {
 	//判断弹夹是否为空
-	if (ServerPrimaryWeapon->ClipCurrentAmmo)
+	if (ServerPrimaryWeapon->ClipCurrentAmmo > 0 && !IsReloading)
 	{
 		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
 		if (UKismetMathLibrary::VSize(GetVelocity()) > 0.1f)
@@ -487,7 +489,7 @@ void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 	{
 		//客户端手臂Reload动画
 		ClientReload();
-	
+		IsReloading = true;
 		//服务器身体多播换弹动画
 		MultiReload();
 
