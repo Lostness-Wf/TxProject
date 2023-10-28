@@ -406,14 +406,18 @@ AWeaponBaseClient* AFPSCharacterBase::GetCurrentClientFPArmsWeaponActor()
 {
 	switch (ActiveWeapon)
 	{
-		case EWeaponType::None:
-			return nullptr;
-			break;
 		case EWeaponType::AK47:
 		{
 			return ClientPrimaryWeapon;
 		}
 			break;
+
+		case EWeaponType::M4A1:
+		{
+			return ClientPrimaryWeapon;
+		}
+		break;
+
 		case EWeaponType::DesertEagle:
 			return nullptr;
 			break;
@@ -435,6 +439,13 @@ AWeaponBaseServer* AFPSCharacterBase::GetCurrentServerTPBodysWeaponActor()
 		return ServerPrimaryWeapon;
 	}
 	break;
+
+	case EWeaponType::M4A1:
+	{
+		return ServerPrimaryWeapon;
+	}
+	break;
+
 	case EWeaponType::DesertEagle:
 		return nullptr;
 		break;
@@ -768,6 +779,12 @@ void AFPSCharacterBase::InputFirePressed()
 		}
 		break;
 
+		case EWeaponType::M4A1:
+		{
+			FireWeaponPrimary();
+		}
+		break;
+
 		default:
 		break;
 	}
@@ -791,6 +808,12 @@ void AFPSCharacterBase::InputFireReleased()
 		}
 		break;
 
+		case EWeaponType::M4A1:
+		{
+			StopFirePrimary();
+		}
+		break;
+
 		default:
 		break;
 	}
@@ -809,8 +832,12 @@ void AFPSCharacterBase::InputReload()
 				{
 					ServerReloadPrimary();
 				}
-			case EWeaponType::DesertEagle:
-				break;
+			
+			case EWeaponType::M4A1:
+				{
+					ServerReloadPrimary();
+				}
+
 			default:
 				break;
 			}

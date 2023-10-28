@@ -71,8 +71,14 @@ void AWeaponBaseServer::MultiShootingEffect_Implementation()
 	if (GetOwner() != UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
 	{
 		//»ðÑæÁ£×ÓVFX
+		FName MuzzleFlashSocketName = TEXT("Fire_FX_Slot");
+		if (KindOfWeapon == EWeaponType::M4A1)
+		{
+			MuzzleFlashSocketName = TEXT("MuzzleSocket");
+		}
+
 		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, WeaponMesh,
-			TEXT("Fire_FX_Slot"), FVector::ZeroVector,
+			MuzzleFlashSocketName, FVector::ZeroVector,
 			FRotator::ZeroRotator, FVector::OneVector,
 			EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None,
 			true);
