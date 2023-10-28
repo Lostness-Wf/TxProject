@@ -788,21 +788,27 @@ void AFPSCharacterBase::InputFirePressed()
 		break;
 
 		case EWeaponType::AK47:
-		{
-			FireWeaponPrimary();
-		}
-		break;
+			{
+				FireWeaponPrimary();
+			}
+			break;
 
 		case EWeaponType::DesertEagle:
-		{
-		}
-		break;
+			{
+			}
+			break;
 
 		case EWeaponType::M4A1:
-		{
-			FireWeaponPrimary();
-		}
-		break;
+			{
+				FireWeaponPrimary();
+			}
+			break;
+
+		case EWeaponType::MP7:
+			{
+				FireWeaponPrimary();
+			}
+			break;
 
 		default:
 		break;
@@ -817,21 +823,27 @@ void AFPSCharacterBase::InputFireReleased()
 		break;
 
 		case EWeaponType::AK47:
-		{
-			StopFirePrimary();
-		}
-		break;
+			{
+				StopFirePrimary();
+			}
+			break;
 
 		case EWeaponType::DesertEagle:
-		{
-		}
-		break;
+			{
+			}
+			break;
 
 		case EWeaponType::M4A1:
-		{
-			StopFirePrimary();
-		}
-		break;
+			{
+				StopFirePrimary();
+			}
+			break;
+
+		case EWeaponType::MP7:
+			{
+				StopFirePrimary();
+			}
+			break;
 
 		default:
 		break;
@@ -851,11 +863,19 @@ void AFPSCharacterBase::InputReload()
 				{
 					ServerReloadPrimary();
 				}
-			
+				break;
+
 			case EWeaponType::M4A1:
 				{
 					ServerReloadPrimary();
 				}
+				break;
+
+			case EWeaponType::MP7:
+				{
+					ServerReloadPrimary();
+				}
+				break;
 
 			default:
 				break;
