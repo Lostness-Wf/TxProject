@@ -161,29 +161,34 @@ void AFPSCharacterBase::DelayPlayArmReloadCallBack()
 	//Temp
 	//UE_LOG(LogTemp, Warning, TEXT("ReloadCallBack"));
 
-	int32 GunCurrentAmmo = ServerPrimaryWeapon->GunCurrentAmmo;
-	int32 CLipCurrentAmmo = ServerPrimaryWeapon->ClipCurrentAmmo;
-	int32 const MaxClipAmmo = ServerPrimaryWeapon->MaxClipAmmo;
+	AWeaponBaseServer* CurrentServerWeapon = GetCurrentServerTPBodysWeaponActor();
 
-	IsReloading = false;
-
-	//备弹数小于所需装填子弹，剩余备弹全部装填
-	if (MaxClipAmmo - CLipCurrentAmmo >= GunCurrentAmmo)
+	if (ServerSecondaryWeapon)
 	{
-		CLipCurrentAmmo += GunCurrentAmmo;
-		GunCurrentAmmo = 0;
-	}
-	//备弹数大于装填所需子弹
-	else
-	{
-		GunCurrentAmmo -= MaxClipAmmo - CLipCurrentAmmo;
-		CLipCurrentAmmo = MaxClipAmmo;
-	}
+		int32 GunCurrentAmmo = ServerSecondaryWeapon->GunCurrentAmmo;
+		int32 CLipCurrentAmmo = ServerSecondaryWeapon->ClipCurrentAmmo;
+		int32 const MaxClipAmmo = ServerSecondaryWeapon->MaxClipAmmo;
 
-	ServerPrimaryWeapon->GunCurrentAmmo = GunCurrentAmmo;
-	ServerPrimaryWeapon->ClipCurrentAmmo = CLipCurrentAmmo;
+		IsReloading = false;
 
-	ClientUpdateAmmoUI(CLipCurrentAmmo, GunCurrentAmmo);
+		//备弹数小于所需装填子弹，剩余备弹全部装填
+		if (MaxClipAmmo - CLipCurrentAmmo >= GunCurrentAmmo)
+		{
+			CLipCurrentAmmo += GunCurrentAmmo;
+			GunCurrentAmmo = 0;
+		}
+		//备弹数大于装填所需子弹
+		else
+		{
+			GunCurrentAmmo -= MaxClipAmmo - CLipCurrentAmmo;
+			CLipCurrentAmmo = MaxClipAmmo;
+		}
+
+		ServerSecondaryWeapon->GunCurrentAmmo = GunCurrentAmmo;
+		ServerSecondaryWeapon->ClipCurrentAmmo = CLipCurrentAmmo;
+
+		ClientUpdateAmmoUI(CLipCurrentAmmo, GunCurrentAmmo);
+	}
 }
 
 void AFPSCharacterBase::AutoFire()
@@ -689,7 +694,7 @@ bool AFPSCharacterBase::ServerFirePistolWeapon_Validate(FVector CameraLocation, 
 void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 {
 	//判断弹夹未满而且还有备弹
-	if (ServerPrimaryWeapon->ClipCurrentAmmo < ServerPrimaryWeapon->MaxClipAmmo && ServerPrimaryWeapon->GunCurrentAmmo > 0)
+	if (ServerSecondaryWeapon->ClipCurrentAmmo < ServerSecondaryWeapon->MaxClipAmmo && ServerSecondaryWeapon->GunCurrentAmmo > 0)
 	{
 		//客户端手臂Reload动画
 		ClientReload();
@@ -697,7 +702,7 @@ void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 		//服务器身体多播换弹动画
 		MultiReload();
 
-		if (ClientPrimaryWeapon)
+		if (ServerSecondaryWeapon)
 		{
 			FLatentActionInfo ActionInfo;
 			ActionInfo.CallbackTarget = this;
@@ -710,6 +715,34 @@ void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 }
 
 bool AFPSCharacterBase::ServerReloadPrimary_Validate()
+{
+	return true;
+}
+
+void AFPSCharacterBase::ServerReloadSecondary_Implementation()
+{
+	//判断弹夹未满而且还有备弹
+	if (ServerSecondaryWeapon->ClipCurrentAmmo < ServerSecondaryWeapon->MaxClipAmmo && ServerSecondaryWeapon->GunCurrentAmmo > 0)
+	{
+		//客户端手臂Reload动画
+		ClientReload();
+		IsReloading = true;
+		//服务器身体多播换弹动画
+		MultiReload();
+
+		if (ClientSecondaryWeapon)
+		{
+			FLatentActionInfo ActionInfo;
+			ActionInfo.CallbackTarget = this;
+			ActionInfo.ExecutionFunction = TEXT("DelayPlayArmReloadCallBack");
+			ActionInfo.UUID = FMath::Rand();
+			ActionInfo.Linkage = 0;
+			UKismetSystemLibrary::Delay(this, ClientSecondaryWeapon->ClientArmsReloadMontage->GetPlayLength(), ActionInfo);
+		}
+	}
+}
+
+bool AFPSCharacterBase::ServerReloadSecondary_Validate()
 {
 	return true;
 }
@@ -1073,6 +1106,12 @@ void AFPSCharacterBase::InputReload()
 			case EWeaponType::MP7:
 				{
 					ServerReloadPrimary();
+				}
+				break;
+
+			case EWeaponType::DesertEagle:
+				{
+					ServerReloadSecondary();
 				}
 				break;
 

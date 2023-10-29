@@ -188,11 +188,17 @@ public:
 	bool ServerFirePistolWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
 
-	//服务器换弹
+	//服务器主武器换弹
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerReloadPrimary();
 	void ServerReloadPrimary_Implementation();
 	bool ServerReloadPrimary_Validation();
+
+	//服务器副武器换弹
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerReloadSecondary();
+	void ServerReloadSecondary_Implementation();
+	bool ServerReloadSecondary_Validation();
 
 	//停止射击
 	UFUNCTION(Server, Reliable, WithValidation)
