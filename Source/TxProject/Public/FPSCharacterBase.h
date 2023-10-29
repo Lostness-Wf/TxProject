@@ -112,6 +112,10 @@ private:
 	float OldHorizontalRecoilAmount;
 	float HorizontalRecoilAmount;
 
+	//…≥”•…¢…‰
+	float PistolSpreadMin = 0;
+	float PistolSpreadMax = 0;
+
 	// «∑Ò‘⁄…‰ª˜
 	UPROPERTY(Replicated)
 	bool IsFiring;
@@ -142,8 +146,12 @@ private:
 	//…≥”•Õ£÷π…‰ª˜
 	void StopFireSecondary();
 
-	//…≥Ã≤…‰œﬂºÏ≤‚
+	//…≥”•…‰œﬂºÏ≤‚
 	void PistolLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+
+	//…≥”•…¢…‰«Â¡„
+	UFUNCTION()
+	void DelaySpreadWeaponShootCallBack();
 
 	//ÕÊº“…À∫¶”¶”√
 	void DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo);

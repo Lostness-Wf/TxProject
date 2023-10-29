@@ -111,6 +111,16 @@ public:
 	UPROPERTY(EditAnywhere)
 	float MovingFireRandomRange;
 
+	//…≥”•…¢…‰ª÷∏¥ ±º‰
+	UPROPERTY(EditAnywhere, Category = "SpreadWeaponData")
+	float SpreadWeaponCallBackRate;
+
+	UPROPERTY(EditAnywhere, Category = "SpreadWeaponData")
+	float SpreadWeaponMinIndex;
+
+	UPROPERTY(EditAnywhere, Category = "SpreadWeaponData")
+	float SpreadWeaponMaxIndex;
+
 	UFUNCTION(Server, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();

@@ -340,7 +340,7 @@ void AFPSCharacterBase::StopFireSecondary()
 void AFPSCharacterBase::PistolLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
 {
 	FVector EndLocation;
-	FVector CameraForwardVector = UKismetMathLibrary::GetForwardVector(CameraRotation);
+	FVector CameraForwardVector;
 	TArray<AActor*> IgnoreArray;
 	IgnoreArray.Add(this);
 	FHitResult HitResult;
@@ -350,6 +350,12 @@ void AFPSCharacterBase::PistolLineTrace(FVector CameraLocation, FRotator CameraR
 		if (IsMoving)
 		{
 			//跑打
+			FRotator Rotator;
+			Rotator.Roll = CameraRotation.Roll;
+			Rotator.Pitch = CameraRotation.Pitch + UKismetMathLibrary::RandomFloatInRange(PistolSpreadMin, PistolSpreadMax);
+			Rotator.Yaw = CameraRotation.Yaw + UKismetMathLibrary::RandomFloatInRange(PistolSpreadMin, PistolSpreadMax);
+			CameraForwardVector = UKismetMathLibrary::GetForwardVector(Rotator);
+
 			FVector Vector = CameraLocation + CameraForwardVector * ServerSecondaryWeapon->BulletDistance;
 			float RandomX = UKismetMathLibrary::RandomFloatInRange(-ServerSecondaryWeapon->MovingFireRandomRange, ServerSecondaryWeapon->MovingFireRandomRange);
 			float RandomY = UKismetMathLibrary::RandomFloatInRange(-ServerSecondaryWeapon->MovingFireRandomRange, ServerSecondaryWeapon->MovingFireRandomRange);
@@ -358,12 +364,22 @@ void AFPSCharacterBase::PistolLineTrace(FVector CameraLocation, FRotator CameraR
 		}
 		else
 		{
+			//沙鹰连续射击精准度下降，停止射击精准度恢复
+			FRotator Rotator;
+			Rotator.Roll = CameraRotation.Roll;
+			Rotator.Pitch = CameraRotation.Pitch + UKismetMathLibrary::RandomFloatInRange(PistolSpreadMin, PistolSpreadMax);
+			Rotator.Yaw = CameraRotation.Yaw + UKismetMathLibrary::RandomFloatInRange(PistolSpreadMin, PistolSpreadMax);
+			CameraForwardVector = UKismetMathLibrary::GetForwardVector(Rotator);
+
 			EndLocation = CameraLocation + CameraForwardVector * ServerSecondaryWeapon->BulletDistance;
 		}
 	}
 
 	bool HitSuccess = UKismetSystemLibrary::LineTraceSingle(GetWorld(), CameraLocation, EndLocation, ETraceTypeQuery::TraceTypeQuery1, false, IgnoreArray,
 		EDrawDebugTrace::None, HitResult, true, FLinearColor::Red, FLinearColor::Green, 3.f);
+
+	PistolSpreadMin -= ServerSecondaryWeapon->SpreadWeaponMaxIndex;
+	PistolSpreadMax += ServerSecondaryWeapon->SpreadWeaponMinIndex;
 
 	if (HitSuccess)
 	{
@@ -382,6 +398,12 @@ void AFPSCharacterBase::PistolLineTrace(FVector CameraLocation, FRotator CameraR
 			MultiSpawnBulletDecall(HitResult.Location, XRotator);
 		}
 	}
+}
+
+void AFPSCharacterBase::DelaySpreadWeaponShootCallBack()
+{
+	PistolSpreadMin = 0;
+	PistolSpreadMax = 0;
 }
 
 void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo)
@@ -633,6 +655,14 @@ void AFPSCharacterBase::ServerFirePistolWeapon_Implementation(FVector CameraLoca
 {
 	if (ServerSecondaryWeapon)
 	{
+		//散射清零计数器
+		FLatentActionInfo ActionInfo;
+		ActionInfo.CallbackTarget = this;
+		ActionInfo.ExecutionFunction = TEXT("DelaySpreadWeaponShootCallBack");
+		ActionInfo.UUID = FMath::Rand();
+		ActionInfo.Linkage = 0;
+		UKismetSystemLibrary::Delay(this, ServerSecondaryWeapon->SpreadWeaponCallBackRate, ActionInfo);
+
 		//特效和声音组播
 		ServerSecondaryWeapon->MultiShootingEffect();
 
