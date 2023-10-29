@@ -36,6 +36,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	int FPArmsBlendPose;
 
+	UPROPERTY(EditAnywhere)
+	float AimingFOV;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

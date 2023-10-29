@@ -55,6 +55,9 @@ protected:
 
 	void InputReload();
 
+	void InputAimingPressed();
+	void InputAimingReleased();
+
 public:
 	void EquipPrimary(AWeaponBaseServer* WeaponBaseServer);
 
@@ -165,6 +168,14 @@ private:
 	UPROPERTY(Replicated)
 	bool IsAiming;
 
+	//¾Ñ»÷Ç¹¿ª¾µUI
+	UPROPERTY(VisibleAnywhere, Category = "SniperUI")
+	UUserWidget* WidgetScope;
+
+	UPROPERTY(EditAnywhere, Category = "SniperUI")
+	TSubclassOf<UUserWidget> SniperScopeBPClass;
+
+	//¾Ñ»÷Ç¹¿ªÇ¹¼ä¸ô
 	UFUNCTION()
 	void DelaySniperShootCallBack();
 
@@ -225,6 +236,12 @@ public:
 	void ServerStopFiring_Implementation();
 	bool ServerStopFiring_Validation();
 
+	//·þÎñÆ÷ÉèÖÃÃé×¼×´Ì¬
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSetAiming(bool AimingState);
+	void ServerSetAiming_Implementation(bool AimingState);
+	bool ServerSetAiming_Validation(bool AimingState);
+
 	//Éä»÷×é²¥
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void MultiShooting();
@@ -269,4 +286,10 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ClientReload();
+
+	UFUNCTION(Client, Reliable)
+	void ClientAiming();
+	
+	UFUNCTION(Client, Reliable)
+	void ClientEndAiming();
 };

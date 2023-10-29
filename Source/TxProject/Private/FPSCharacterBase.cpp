@@ -10,6 +10,7 @@
 #include "GameFramework/Actor.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Net/UnrealNetwork.h"
+#include "UMG/Public/Blueprint/UserWidget.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -142,6 +143,9 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	InputComponent->BindAction(TEXT("Fire"), IE_Released, this, &AFPSCharacterBase::InputFireReleased);
 
 	InputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AFPSCharacterBase::InputReload);
+
+	InputComponent->BindAction(TEXT("Aiming"), IE_Pressed, this, &AFPSCharacterBase::InputAimingPressed);
+	InputComponent->BindAction(TEXT("Aiming"), IE_Released, this, &AFPSCharacterBase::InputAimingReleased);
 }
 
 
@@ -463,6 +467,7 @@ void AFPSCharacterBase::SniperLineTrace(FVector CameraLocation, FRotator CameraR
 			{
 				EndLocation = CameraLocation + CameraForwardVector * ServerPrimaryWeapon->BulletDistance;
 			}
+			ClientEndAiming();
 		}
 		//Ã»¿ª¾µ
 		else
@@ -913,6 +918,16 @@ bool AFPSCharacterBase::ServerStopFiring_Validate()
 	return true;
 }
 
+void AFPSCharacterBase::ServerSetAiming_Implementation(bool AimingState)
+{
+	IsAiming = AimingState;
+}
+
+bool AFPSCharacterBase::ServerSetAiming_Validate(bool AimingState)
+{
+	return true;
+}
+
 void AFPSCharacterBase::MultiShooting_Implementation()
 {
 	AWeaponBaseServer* CurrentServerWeapon = GetCurrentServerTPBodysWeaponActor();
@@ -1138,6 +1153,36 @@ void AFPSCharacterBase::ClientReload_Implementation()
 	}
 }
 
+void AFPSCharacterBase::ClientAiming_Implementation()
+{
+	FPArmsMesh->SetHiddenInGame(true);
+
+	if (ClientPrimaryWeapon)
+	{
+		ClientPrimaryWeapon->SetActorHiddenInGame(true);
+		PlayerCamera->SetFieldOfView(ClientPrimaryWeapon->AimingFOV);
+	}
+
+	WidgetScope = CreateWidget<UUserWidget>(GetWorld(), SniperScopeBPClass);
+	WidgetScope->AddToViewport();
+}
+
+void AFPSCharacterBase::ClientEndAiming_Implementation()
+{
+	FPArmsMesh->SetHiddenInGame(false);
+
+	if (ClientPrimaryWeapon)
+	{
+		ClientPrimaryWeapon->SetActorHiddenInGame(false);
+		PlayerCamera->SetFieldOfView(90);
+	}
+
+	if (WidgetScope)
+	{
+		WidgetScope->RemoveFromParent();
+	}
+}
+
 void AFPSCharacterBase::MoveRight(float AxisValue)
 {
 	AddMovementInput(GetActorRightVector(), AxisValue, false);
@@ -1291,5 +1336,23 @@ void AFPSCharacterBase::InputReload()
 				break;
 			}
 		}
+	}
+}
+
+void AFPSCharacterBase::InputAimingPressed()
+{
+	if (ActiveWeapon == EWeaponType::Sniper)
+	{
+		ServerSetAiming(true);
+		ClientAiming();
+	}
+}
+
+void AFPSCharacterBase::InputAimingReleased()
+{
+	if (ActiveWeapon == EWeaponType::Sniper)
+	{
+		ServerSetAiming(false);
+		ClientEndAiming();
 	}
 }
