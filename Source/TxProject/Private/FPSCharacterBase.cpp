@@ -531,6 +531,16 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 			}
 			break;
 
+		case EWeaponType::Sniper:
+			{
+				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/Sniper/BP_Sniper_Server.BP_Sniper_Server_C'"));
+				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+				ServerWeapon->EquipWeapon();
+				ActiveWeapon = EWeaponType::Sniper;
+				EquipPrimary(ServerWeapon);
+			}
+			break;
+
 		default:
 			break;
 	}
@@ -834,6 +844,10 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 			if (ActiveWeapon == EWeaponType::M4A1)
 			{
 				WeaponSocketName = TEXT("M4A1_Socket");
+			}
+			if (ActiveWeapon == EWeaponType::Sniper)
+			{
+				WeaponSocketName = TEXT("AWP_Socket");
 			}
 
 			ClientPrimaryWeapon->K2_AttachToComponent(FPArmsMesh, WeaponSocketName,

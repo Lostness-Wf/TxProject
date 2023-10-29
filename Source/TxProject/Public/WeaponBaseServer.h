@@ -17,7 +17,8 @@ enum class EWeaponType : uint8
 	AK47 UMETA(DisplayName = "Ak47"),
 	M4A1 UMETA(DisplayName = "M4A1"),
 	MP7 UMETA(DisplayName = "MP7"),
-	DesertEagle UMETA(DisplayName = "DesertEagle")
+	DesertEagle UMETA(DisplayName = "DesertEagle"),
+	Sniper UMETA(DisplayName = "Sniper")
 };
 
 UCLASS()
