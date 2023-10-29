@@ -136,6 +136,15 @@ private:
 	//步枪射线检测
 	void RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
+	//沙鹰开始射击
+	void FireWeaponSecondary();
+
+	//沙鹰停止射击
+	void StopFireSecondary();
+
+	//沙滩射线检测
+	void PistolLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+
 	//玩家伤害应用
 	void DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo);
 
@@ -158,11 +167,18 @@ public:
 	void ServerNormalSpeedWalkAction_Implementation();
 	bool ServerNormalSpeedWalkAction_Validation();
 
-	//服务器射击
+	//服务器主武器射击
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerFireRifleWeapon(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 	void ServerFireRifleWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 	bool ServerFireRifleWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+
+	//服务器副武器射击
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFirePistolWeapon(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+	void ServerFirePistolWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+	bool ServerFirePistolWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+
 
 	//服务器换弹
 	UFUNCTION(Server, Reliable, WithValidation)

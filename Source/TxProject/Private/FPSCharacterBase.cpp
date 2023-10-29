@@ -257,7 +257,6 @@ void AFPSCharacterBase::StopFirePrimary()
 
 	//重置后座力
 	ResetRecoil();
-
 }
 
 void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
@@ -310,6 +309,79 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 
 	}
 
+}
+
+void AFPSCharacterBase::FireWeaponSecondary()
+{
+	//判断弹夹是否为空
+	if (ServerSecondaryWeapon->ClipCurrentAmmo > 0 && !IsReloading)
+	{
+		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
+		if (UKismetMathLibrary::VSize(GetVelocity()) > 0.1f)
+		{
+			ServerFirePistolWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), true);
+		}
+		else
+		{
+			ServerFirePistolWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
+		}
+
+		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
+		ClientFire();
+	}
+}
+
+void AFPSCharacterBase::StopFireSecondary()
+{
+	//更改IsFire
+	ServerStopFiring();
+}
+
+void AFPSCharacterBase::PistolLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	FVector EndLocation;
+	FVector CameraForwardVector = UKismetMathLibrary::GetForwardVector(CameraRotation);
+	TArray<AActor*> IgnoreArray;
+	IgnoreArray.Add(this);
+	FHitResult HitResult;
+
+	if (ServerSecondaryWeapon)
+	{
+		if (IsMoving)
+		{
+			//跑打
+			FVector Vector = CameraLocation + CameraForwardVector * ServerSecondaryWeapon->BulletDistance;
+			float RandomX = UKismetMathLibrary::RandomFloatInRange(-ServerSecondaryWeapon->MovingFireRandomRange, ServerSecondaryWeapon->MovingFireRandomRange);
+			float RandomY = UKismetMathLibrary::RandomFloatInRange(-ServerSecondaryWeapon->MovingFireRandomRange, ServerSecondaryWeapon->MovingFireRandomRange);
+			float RandomZ = UKismetMathLibrary::RandomFloatInRange(-ServerSecondaryWeapon->MovingFireRandomRange, ServerSecondaryWeapon->MovingFireRandomRange);
+			EndLocation = FVector(Vector.X + RandomX, Vector.Y + RandomY, Vector.Z + RandomZ);
+		}
+		else
+		{
+			EndLocation = CameraLocation + CameraForwardVector * ServerSecondaryWeapon->BulletDistance;
+		}
+	}
+
+	bool HitSuccess = UKismetSystemLibrary::LineTraceSingle(GetWorld(), CameraLocation, EndLocation, ETraceTypeQuery::TraceTypeQuery1, false, IgnoreArray,
+		EDrawDebugTrace::None, HitResult, true, FLinearColor::Red, FLinearColor::Green, 3.f);
+
+	if (HitSuccess)
+	{
+		AFPSCharacterBase* FPSCharacter = Cast<AFPSCharacterBase>(HitResult.GetActor());
+
+		if (FPSCharacter)
+		{
+			//打到玩家应用伤害
+			DamagePlayer(HitResult.PhysMaterial.Get(), HitResult.GetActor(), CameraLocation, HitResult);
+		}
+		else
+		{
+			FRotator XRotator = UKismetMathLibrary::MakeRotFromX(HitResult.Normal);
+
+			//组播打到墙壁生成弹孔
+			MultiSpawnBulletDecall(HitResult.Location, XRotator);
+		}
+	}
 }
 
 void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo)
@@ -442,26 +514,29 @@ AWeaponBaseClient* AFPSCharacterBase::GetCurrentClientFPArmsWeaponActor()
 	switch (ActiveWeapon)
 	{
 		case EWeaponType::AK47:
-		{
-			return ClientPrimaryWeapon;
-		}
+			{
+				return ClientPrimaryWeapon;
+			}
 			break;
 
 		case EWeaponType::M4A1:
-		{
-			return ClientPrimaryWeapon;
-		}
-		break;
+			{
+				return ClientPrimaryWeapon;
+			}
+			break;
 
 		case EWeaponType::MP7:
-		{
-			return ClientPrimaryWeapon;
-		}
-		break;
+			{
+				return ClientPrimaryWeapon;
+			}
+			break;
 
 		case EWeaponType::DesertEagle:
-			return nullptr;
+			{
+				return ClientSecondaryWeapon;
+			}
 			break;
+
 		default:
 			return nullptr;
 			break;
@@ -474,26 +549,29 @@ AWeaponBaseServer* AFPSCharacterBase::GetCurrentServerTPBodysWeaponActor()
 	{
 
 		case EWeaponType::AK47:
-		{
-			return ServerPrimaryWeapon;
-		}
-		break;
+			{
+				return ServerPrimaryWeapon;
+			}
+			break;
 
 		case EWeaponType::M4A1:
-		{
-			return ServerPrimaryWeapon;
-		}
-		break;
+			{
+				return ServerPrimaryWeapon;
+			}
+			break;
 
 		case EWeaponType::MP7:
-		{
-			return ServerPrimaryWeapon;
-		}
-		break;
+			{
+				return ServerPrimaryWeapon;
+			}
+			break;
 
 		case EWeaponType::DesertEagle:
-			return nullptr;
+			{
+				return ServerSecondaryWeapon;
+			}
 			break;
+
 		default:
 			return nullptr;
 			break;
@@ -551,6 +629,33 @@ bool AFPSCharacterBase::ServerFireRifleWeapon_Validate(FVector CameraLocation, F
 	return true;
 }
 
+void AFPSCharacterBase::ServerFirePistolWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	if (ServerSecondaryWeapon)
+	{
+		//特效和声音组播
+		ServerSecondaryWeapon->MultiShootingEffect();
+
+		//子弹数量-1
+		ServerSecondaryWeapon->ClipCurrentAmmo -= 1;
+
+		//播放第三人称身体射击动画
+		MultiShooting();
+
+		//客户端UI更新
+		ClientUpdateAmmoUI(ServerSecondaryWeapon->ClipCurrentAmmo, ServerSecondaryWeapon->GunCurrentAmmo);
+	}
+
+	IsFiring = true;
+
+	PistolLineTrace(CameraLocation, CameraRotation, IsMoving);
+}
+
+bool AFPSCharacterBase::ServerFirePistolWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	return true;
+}
+
 void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 {
 	//判断弹夹未满而且还有备弹
@@ -591,11 +696,12 @@ bool AFPSCharacterBase::ServerStopFiring_Validate()
 
 void AFPSCharacterBase::MultiShooting_Implementation()
 {
+	AWeaponBaseServer* CurrentServerWeapon = GetCurrentServerTPBodysWeaponActor();
 	if (ServerBodysAnimBP)
 	{
-		if (ServerPrimaryWeapon)
+		if (CurrentServerWeapon)
 		{
-			ServerBodysAnimBP->Montage_Play(ServerPrimaryWeapon->ServerTPBodysShootAnimMontage);
+			ServerBodysAnimBP->Montage_Play(CurrentServerWeapon->ServerTPBodysShootAnimMontage);
 		}
 	}
 }
@@ -607,9 +713,10 @@ bool AFPSCharacterBase::MultiShooting_Validate()
 
 void AFPSCharacterBase::MultiSpawnBulletDecall_Implementation(FVector Location, FRotator Rotation)
 {
-	if (ServerPrimaryWeapon)
+	AWeaponBaseServer* CurrentServerWeapon = GetCurrentServerTPBodysWeaponActor();
+	if (CurrentServerWeapon)
 	{
-		UDecalComponent* Decal =  UGameplayStatics::SpawnDecalAtLocation(GetWorld(), ServerPrimaryWeapon->BullteDecalMaterial, FVector(5, 5, 5),
+		UDecalComponent* Decal =  UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CurrentServerWeapon->BullteDecalMaterial, FVector(5, 5, 5),
 			Location, Rotation, 10);
 
 		if (Decal)
@@ -718,7 +825,7 @@ void AFPSCharacterBase::ClientEquipFPArmsSecondary_Implementation()
 void AFPSCharacterBase::ClientFire_Implementation()
 {
 	AWeaponBaseClient* CurrentWeapon = GetCurrentClientFPArmsWeaponActor();
-	if (ClientPrimaryWeapon)
+	if (CurrentWeapon)
 	{
 		//播放枪支射击动画
 		CurrentWeapon->PlayShootAnimation();
@@ -855,6 +962,7 @@ void AFPSCharacterBase::InputFirePressed()
 
 		case EWeaponType::DesertEagle:
 			{
+				FireWeaponSecondary();
 			}
 			break;
 
@@ -890,6 +998,7 @@ void AFPSCharacterBase::InputFireReleased()
 
 		case EWeaponType::DesertEagle:
 			{
+				StopFireSecondary();
 			}
 			break;
 
