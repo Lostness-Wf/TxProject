@@ -153,6 +153,21 @@ private:
 	UFUNCTION()
 	void DelaySpreadWeaponShootCallBack();
 
+	//¾Ñ»÷Ç¹¿ªÇ¹
+	void FireWeaponSniper();
+
+	//¾Ñ»÷Ç¹Í£Ö¹¿ªÇ¹
+	void StopFireSniper();
+
+	//¾Ñ»÷Ç¹ÉäÏß¼ì²â
+	void SniperLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+
+	UPROPERTY(Replicated)
+	bool IsAiming;
+
+	UFUNCTION()
+	void DelaySniperShootCallBack();
+
 	//Íæ¼ÒÉËº¦Ó¦ÓÃ
 	void DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo);
 
@@ -187,6 +202,10 @@ public:
 	void ServerFirePistolWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 	bool ServerFirePistolWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerFireSniperWeapon(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+	void ServerFireSniperWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
+	void ServerFireSniperWeapon_Validation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving);
 
 	//·þÎñÆ÷Ö÷ÎäÆ÷»»µ¯
 	UFUNCTION(Server, Reliable, WithValidation)

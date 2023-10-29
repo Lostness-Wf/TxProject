@@ -44,7 +44,7 @@ void AFPSCharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	Health = 100;
-
+	IsAiming = false;
 	OnTakePointDamage.AddDynamic(this, &AFPSCharacterBase::OnHit);
 
 	StartWithKindOfWeapon();
@@ -69,6 +69,7 @@ void AFPSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION(AFPSCharacterBase, IsFiring, COND_None);
 	DOREPLIFETIME_CONDITION(AFPSCharacterBase, IsReloading, COND_None);
 	DOREPLIFETIME_CONDITION(AFPSCharacterBase, ActiveWeapon, COND_None);
+	DOREPLIFETIME_CONDITION(AFPSCharacterBase, IsAiming, COND_None);
 }
 
 void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
@@ -411,6 +412,99 @@ void AFPSCharacterBase::DelaySpreadWeaponShootCallBack()
 	PistolSpreadMax = 0;
 }
 
+void AFPSCharacterBase::FireWeaponSniper()
+{
+	//判断弹夹是否为空
+	if (ServerPrimaryWeapon->ClipCurrentAmmo > 0 && !IsReloading && !IsFiring)
+	{
+		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
+		if (UKismetMathLibrary::VSize(GetVelocity()) > 0.1f)
+		{
+			ServerFireSniperWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), true);
+		}
+		else
+		{
+			ServerFireSniperWeapon(PlayerCamera->GetComponentLocation(), PlayerCamera->GetComponentRotation(), false);
+		}
+
+		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
+		ClientFire();
+	}
+}
+
+void AFPSCharacterBase::StopFireSniper()
+{
+
+}
+
+void AFPSCharacterBase::SniperLineTrace(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	FVector EndLocation;
+	FVector CameraForwardVector = UKismetMathLibrary::GetForwardVector(CameraRotation);
+	TArray<AActor*> IgnoreArray;
+	IgnoreArray.Add(this);
+	FHitResult HitResult;
+
+	if (ServerPrimaryWeapon)
+	{
+		//是否开镜
+		if (IsAiming)
+		{
+			if (IsMoving)
+			{
+				//开镜跑打
+				FVector Vector = CameraLocation + CameraForwardVector * ServerPrimaryWeapon->BulletDistance;
+				float RandomX = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+				float RandomY = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+				float RandomZ = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+				EndLocation = FVector(Vector.X + RandomX, Vector.Y + RandomY, Vector.Z + RandomZ);
+			}
+			else
+			{
+				EndLocation = CameraLocation + CameraForwardVector * ServerPrimaryWeapon->BulletDistance;
+			}
+		}
+		//没开镜
+		else
+		{
+			FVector Vector = CameraLocation + CameraForwardVector * ServerPrimaryWeapon->BulletDistance;
+			float RandomX = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+			float RandomY = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+			float RandomZ = UKismetMathLibrary::RandomFloatInRange(-ServerPrimaryWeapon->MovingFireRandomRange, ServerPrimaryWeapon->MovingFireRandomRange);
+			EndLocation = FVector(Vector.X + RandomX, Vector.Y + RandomY, Vector.Z + RandomZ);
+		}
+	}
+
+	bool HitSuccess = UKismetSystemLibrary::LineTraceSingle(GetWorld(), CameraLocation, EndLocation, ETraceTypeQuery::TraceTypeQuery1, false, IgnoreArray,
+		EDrawDebugTrace::None, HitResult, true, FLinearColor::Red, FLinearColor::Green, 3.f);
+
+	if (HitSuccess)
+	{
+		//Temp
+		//UKismetSystemLibrary::PrintString(GetWorld(), FString::Printf(TEXT("Hit actor name : %s"), *HitResult.GetActor()->GetName()));
+
+		AFPSCharacterBase* FPSCharacter = Cast<AFPSCharacterBase>(HitResult.GetActor());
+
+		if (FPSCharacter)
+		{
+			//打到玩家应用伤害
+			DamagePlayer(HitResult.PhysMaterial.Get(), HitResult.GetActor(), CameraLocation, HitResult);
+		}
+		else
+		{
+			FRotator XRotator = UKismetMathLibrary::MakeRotFromX(HitResult.Normal);
+
+			//组播打到墙壁生成弹孔
+			MultiSpawnBulletDecall(HitResult.Location, XRotator);
+		}
+	}
+}
+
+void AFPSCharacterBase::DelaySniperShootCallBack()
+{
+	IsFiring = false;
+}
+
 void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo)
 {
 	//根据击中位置应用不同伤害值
@@ -574,6 +668,12 @@ AWeaponBaseClient* AFPSCharacterBase::GetCurrentClientFPArmsWeaponActor()
 			}
 			break;
 
+		case EWeaponType::Sniper:
+			{
+				return ClientPrimaryWeapon;
+			}
+			break;
+
 		default:
 			return nullptr;
 			break;
@@ -606,6 +706,12 @@ AWeaponBaseServer* AFPSCharacterBase::GetCurrentServerTPBodysWeaponActor()
 		case EWeaponType::DesertEagle:
 			{
 				return ServerSecondaryWeapon;
+			}
+			break;
+
+		case EWeaponType::Sniper:
+			{
+				return ServerPrimaryWeapon;
 			}
 			break;
 
@@ -697,6 +803,46 @@ void AFPSCharacterBase::ServerFirePistolWeapon_Implementation(FVector CameraLoca
 }
 
 bool AFPSCharacterBase::ServerFirePistolWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	return true;
+}
+
+void AFPSCharacterBase::ServerFireSniperWeapon_Implementation(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
+{
+	if (ServerPrimaryWeapon)
+	{
+
+		//特效和声音组播
+		ServerPrimaryWeapon->MultiShootingEffect();
+
+		//子弹数量-1
+		ServerPrimaryWeapon->ClipCurrentAmmo -= 1;
+
+		//播放第三人称身体射击动画
+		MultiShooting();
+
+		//客户端UI更新
+		ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
+	}
+
+	if (ClientPrimaryWeapon)
+	{
+		//散射清零计数器
+		FLatentActionInfo ActionInfo;
+		ActionInfo.CallbackTarget = this;
+		ActionInfo.ExecutionFunction = TEXT("DelaySniperShootCallBack");
+		ActionInfo.UUID = FMath::Rand();
+		ActionInfo.Linkage = 0;
+		UKismetSystemLibrary::Delay(this, ClientPrimaryWeapon->ClientArmsFireMontage->GetPlayLength(), ActionInfo);
+	}
+
+	IsFiring = true;
+
+	//步枪射线检测
+	SniperLineTrace(CameraLocation, CameraRotation, IsMoving);
+}
+
+bool AFPSCharacterBase::ServerFireSniperWeapon_Validate(FVector CameraLocation, FRotator CameraRotation, bool IsMoving)
 {
 	return true;
 }
@@ -1055,6 +1201,12 @@ void AFPSCharacterBase::InputFirePressed()
 			}
 			break;
 
+		case EWeaponType::Sniper:
+			{
+				FireWeaponSniper();
+			}
+			break;
+
 		default:
 		break;
 	}
@@ -1088,6 +1240,12 @@ void AFPSCharacterBase::InputFireReleased()
 		case EWeaponType::MP7:
 			{
 				StopFirePrimary();
+			}
+			break;
+
+		case EWeaponType::Sniper:
+			{
+				StopFireSniper();
 			}
 			break;
 
