@@ -860,6 +860,7 @@ void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 		//客户端手臂Reload动画
 		ClientReload();
 		IsReloading = true;
+
 		//服务器身体多播换弹动画
 		MultiReload();
 
