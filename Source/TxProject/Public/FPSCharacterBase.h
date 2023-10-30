@@ -188,6 +188,8 @@ private:
 
 	float Health;
 
+	void DeathMatchDeath(AActor* DamageCauser);
+
 public:
 	//¾²²½
 	UFUNCTION(Server, Reliable, WithValidation)

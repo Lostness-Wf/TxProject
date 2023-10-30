@@ -27,4 +27,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "PlayerUI")
 	void UpdateHealthUI(float NewHealth);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
+	void DeathMatchDeath(AActor* DamageActor);
 };

@@ -562,11 +562,21 @@ void AFPSCharacterBase::OnHit(AActor* DamagedActor, float Damage, class AControl
 	if (Health <= 0)
 	{
 		//½ÇÉ«ËÀÍö
+		DeathMatchDeath(DamageCauser);
 	}
 
 	//Temp
 	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("PlayerName : %s Health : %f"),*GetName(), Health));
 
+}
+
+void AFPSCharacterBase::DeathMatchDeath(AActor* DamageActor)
+{
+	AMultiFPSPlayerController* MultiFPSPlayerController = Cast<AMultiFPSPlayerController>(GetController());
+	if (MultiFPSPlayerController)
+	{
+		MultiFPSPlayerController->DeathMatchDeath(DamageActor);
+	}
 }
 
 void AFPSCharacterBase::StartWithKindOfWeapon()
