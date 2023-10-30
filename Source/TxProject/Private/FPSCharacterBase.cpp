@@ -1332,6 +1332,12 @@ void AFPSCharacterBase::InputReload()
 				}
 				break;
 
+			case EWeaponType::Sniper:
+				{
+					ServerReloadPrimary();
+				}
+				break;
+
 			default:
 				break;
 			}
