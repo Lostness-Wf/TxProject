@@ -19,6 +19,9 @@ public:
 	// Sets default values for this character's properties
 	AFPSCharacterBase();
 
+	UFUNCTION()
+	void DelayBeginPlayCallBack();
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* PlayerCamera;

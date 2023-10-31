@@ -39,6 +39,25 @@ AFPSCharacterBase::AFPSCharacterBase()
 	GetMesh()->SetCollisionObjectType(ECC_Pawn);
 }
 
+void AFPSCharacterBase::DelayBeginPlayCallBack()
+{
+	FPSPlayerController = Cast<AMultiFPSPlayerController>(GetController());
+
+	if (FPSPlayerController)
+	{
+		FPSPlayerController->CreatPlayerUI();
+	}
+	else
+	{
+		FLatentActionInfo ActionInfo;
+		ActionInfo.CallbackTarget = this;
+		ActionInfo.ExecutionFunction = TEXT("DelayBeginPlayCallBack");
+		ActionInfo.UUID = FMath::Rand();
+		ActionInfo.Linkage = 0;
+		UKismetSystemLibrary::Delay(this, 0.5, ActionInfo);
+	}
+}
+
 // Called when the game starts or when spawned
 void AFPSCharacterBase::BeginPlay()
 {
@@ -46,10 +65,11 @@ void AFPSCharacterBase::BeginPlay()
 
 	Health = 100;
 	IsAiming = false;
+	IsFiring = false;
+	IsReloading = false;
+
 	OnTakePointDamage.AddDynamic(this, &AFPSCharacterBase::OnHit);
 
-	StartWithKindOfWeapon();
-	
 	ClientArmsAnimBP = FPArmsMesh->GetAnimInstance();
 	ServerBodysAnimBP = GetMesh()->GetAnimInstance();
 
@@ -59,9 +79,17 @@ void AFPSCharacterBase::BeginPlay()
 	{
 		FPSPlayerController->CreatPlayerUI();
 	}
+	else
+	{
+		FLatentActionInfo ActionInfo;
+		ActionInfo.CallbackTarget = this;
+		ActionInfo.ExecutionFunction = TEXT("DelayBeginPlayCallBack");
+		ActionInfo.UUID = FMath::Rand();
+		ActionInfo.Linkage = 0;
+		UKismetSystemLibrary::Delay(this, 0.5, ActionInfo);
+	}
 
-	IsFiring = false;
-	IsReloading = false;
+	StartWithKindOfWeapon();
 }
 
 void AFPSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -89,7 +117,7 @@ void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
 			EAttachmentRule::SnapToTarget,
 			true);
 		ClientEquipFPArmsPriamry();
-
+		ActiveWeapon = ServerPrimaryWeapon->KindOfWeapon;
 		ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
 	}
 }
@@ -110,7 +138,7 @@ void AFPSCharacterBase::EquipSrcondary(AWeaponBaseServer* WeaponBaseServer)
 			EAttachmentRule::SnapToTarget,
 			true);
 		ClientEquipFPArmsSecondary();
-
+		ActiveWeapon = ServerSecondaryWeapon->KindOfWeapon;
 		ClientUpdateAmmoUI(ServerSecondaryWeapon->ClipCurrentAmmo, ServerSecondaryWeapon->GunCurrentAmmo);
 	}
 }
@@ -616,7 +644,6 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C'"));
 				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 				ServerWeapon->EquipWeapon();
-				ActiveWeapon = EWeaponType::AK47;
 				EquipPrimary(ServerWeapon);
 			}
 			break;
@@ -626,7 +653,6 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/M4A1/BP_M4A1_Server.BP_M4A1_Server_C'"));
 				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 				ServerWeapon->EquipWeapon();
-				ActiveWeapon = EWeaponType::M4A1;
 				EquipPrimary(ServerWeapon);
 			}
 			break;
@@ -636,7 +662,6 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/MP7/BP_MP7_Server.BP_MP7_Server_C'"));
 				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 				ServerWeapon->EquipWeapon();
-				ActiveWeapon = EWeaponType::MP7;
 				EquipPrimary(ServerWeapon);
 			}
 			break;
@@ -646,7 +671,6 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/DesertEagle/BP_DesertEagle_Server.BP_DesertEagle_Server_C'"));
 				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 				ServerWeapon->EquipWeapon();
-				ActiveWeapon = EWeaponType::DesertEagle;
 				EquipSrcondary(ServerWeapon);
 			}
 			break;
@@ -656,7 +680,6 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/Sniper/BP_Sniper_Server.BP_Sniper_Server_C'"));
 				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 				ServerWeapon->EquipWeapon();
-				ActiveWeapon = EWeaponType::Sniper;
 				EquipPrimary(ServerWeapon);
 			}
 			break;
@@ -1099,11 +1122,13 @@ void AFPSCharacterBase::ClientFire_Implementation()
 		CurrentWeapon->DisplayWeaponEffect();
 
 		//Camera Shake
-		FPSPlayerController->PlayerCameraShake(CurrentWeapon->CameraShakeClass);
-
-		//×¼ÐÇÀ©É¢¶¯»­
-		FPSPlayerController->DoCrosshairRecoil();
-
+		AMultiFPSPlayerController* MultiFPSController = Cast<AMultiFPSPlayerController>(GetController());
+		if (MultiFPSController)
+		{
+			MultiFPSController->PlayerCameraShake(CurrentWeapon->CameraShakeClass);
+			//×¼ÐÇÀ©É¢¶¯»­
+			MultiFPSController->DoCrosshairRecoil();
+		}
 	}
 
 }
