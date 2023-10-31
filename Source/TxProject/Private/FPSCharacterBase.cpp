@@ -598,7 +598,8 @@ void AFPSCharacterBase::StartWithKindOfWeapon()
 {
 	if (HasAuthority())
 	{
-		PurchaseWeapon(TestStartWeapon);
+		//Ëæ»úÎäÆ÷
+		PurchaseWeapon(static_cast<EWeaponType>(UKismetMathLibrary::RandomIntegerInRange(0, static_cast<int8>(EWeaponType::EEnd) - 1)));
 	}
 }
 
@@ -610,11 +611,6 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 
 	switch (WeaponType)
 	{
-		case EWeaponType::None:
-			{
-			}
-			break;
-
 		case EWeaponType::AK47:
 			{
 				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C'"));
@@ -1255,9 +1251,6 @@ void AFPSCharacterBase::InputFirePressed()
 {
 	switch (ActiveWeapon)
 	{
-		case EWeaponType::None:
-		break;
-
 		case EWeaponType::AK47:
 			{
 				FireWeaponPrimary();
@@ -1297,9 +1290,6 @@ void AFPSCharacterBase::InputFireReleased()
 {
 	switch (ActiveWeapon)
 	{
-		case EWeaponType::None:
-		break;
-
 		case EWeaponType::AK47:
 			{
 				StopFirePrimary();
