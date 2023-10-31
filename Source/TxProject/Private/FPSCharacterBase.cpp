@@ -571,7 +571,22 @@ void AFPSCharacterBase::OnHit(AActor* DamagedActor, float Damage, class AControl
 }
 
 void AFPSCharacterBase::DeathMatchDeath(AActor* DamageActor)
-{
+{	
+	ClientDeathMatchDeath();
+
+	AWeaponBaseClient* CurrentClientWeapon = GetCurrentClientFPArmsWeaponActor();
+	AWeaponBaseServer* CurrentServerWeapon =  GetCurrentServerTPBodysWeaponActor();
+
+	if (CurrentClientWeapon)
+	{
+		CurrentClientWeapon->Destroy();
+	}
+
+	if (CurrentServerWeapon)
+	{
+		CurrentServerWeapon->Destroy();
+	}
+
 	AMultiFPSPlayerController* MultiFPSPlayerController = Cast<AMultiFPSPlayerController>(GetController());
 	if (MultiFPSPlayerController)
 	{
@@ -1191,6 +1206,16 @@ void AFPSCharacterBase::ClientEndAiming_Implementation()
 	if (WidgetScope)
 	{
 		WidgetScope->RemoveFromParent();
+	}
+}
+
+void AFPSCharacterBase::ClientDeathMatchDeath_Implementation()
+{
+	AWeaponBaseClient* CurrentClientWeapon = GetCurrentClientFPArmsWeaponActor();
+
+	if (CurrentClientWeapon)
+	{
+		CurrentClientWeapon->Destroy();
 	}
 }
 

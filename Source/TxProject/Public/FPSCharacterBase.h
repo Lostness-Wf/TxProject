@@ -294,4 +294,7 @@ public:
 	
 	UFUNCTION(Client, Reliable)
 	void ClientEndAiming();
+
+	UFUNCTION(Client, Reliable)
+	void ClientDeathMatchDeath();
 };
