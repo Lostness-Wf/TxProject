@@ -33,4 +33,9 @@ class TXPROJECT_API UKismetMultiFPSLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 	
+	UFUNCTION(BlueprintCallable, Category = "Sort")
+	static void SortValues(UPARAM(ref)TArray<FDeathMatchPlayerData>& Values);
+
+	UFUNCTION(BlueprintCallable, Category = "Sort")
+	static TArray<FDeathMatchPlayerData>& QuickSort(UPARAM(ref)TArray<FDeathMatchPlayerData>& Values, int start, int end);
 };
