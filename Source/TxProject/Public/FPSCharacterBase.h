@@ -49,17 +49,32 @@ protected:
 	void MoveRight(float AxisValue);
 	void MoveForward(float AxisValue);
 
+	UFUNCTION(BlueprintCallable)
 	void JumpAction();
+
+	UFUNCTION(BlueprintCallable)
 	void StopJumpAction();
+
 	void LowSpeedWalkAction();
 	void NormalSpeedWalkAction();
+
+	UFUNCTION(BlueprintCallable)
 	void InputFirePressed();
+
+	UFUNCTION(BlueprintCallable)
 	void InputFireReleased();
 
+	UFUNCTION(BlueprintCallable)
 	void InputReload();
 
+	UFUNCTION(BlueprintCallable)
 	void InputAimingPressed();
+
+	UFUNCTION(BlueprintCallable)
 	void InputAimingReleased();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsCurrentWeaponSniper();
 
 public:
 	void EquipPrimary(AWeaponBaseServer* WeaponBaseServer);

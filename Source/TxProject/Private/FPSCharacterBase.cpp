@@ -1415,3 +1415,15 @@ void AFPSCharacterBase::InputAimingReleased()
 		ClientEndAiming();
 	}
 }
+
+bool AFPSCharacterBase::IsCurrentWeaponSniper()
+{
+	if (ActiveWeapon == EWeaponType::Sniper)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
