@@ -154,7 +154,7 @@ void AFPSCharacterBase::Tick(float DeltaTime)
 void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	
 	InputComponent->BindAxis(TEXT("MoveRight"), this, &AFPSCharacterBase::MoveRight);
 	InputComponent->BindAxis(TEXT("MoveForward"), this, &AFPSCharacterBase::MoveForward);
 
@@ -540,15 +540,17 @@ void AFPSCharacterBase::DelaySniperShootCallBack()
 
 void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor* DamageActor, FVector& HitFromDirection, FHitResult& HitInfo)
 {
+	AWeaponBaseServer* CurrentServerWeapon = GetCurrentServerTPBodysWeaponActor();
+
 	//根据击中位置应用不同伤害值
-	if (ServerPrimaryWeapon)
+	if (CurrentServerWeapon)
 	{
 		switch (PhysicalMaterial->SurfaceType)
 			{
 				case SurfaceType1:
 				{
 					//Head
-					UGameplayStatics::ApplyPointDamage(DamageActor, ServerPrimaryWeapon->BaseDamage * 4, HitFromDirection, HitInfo, GetController(),
+					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 4, HitFromDirection, HitInfo, GetController(),
 						this, UDamageType::StaticClass());
 				}
 				break;
@@ -556,7 +558,7 @@ void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor
 				case SurfaceType2:
 				{
 					//Body
-					UGameplayStatics::ApplyPointDamage(DamageActor, ServerPrimaryWeapon->BaseDamage * 1, HitFromDirection, HitInfo, GetController(),
+					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 1, HitFromDirection, HitInfo, GetController(),
 						this, UDamageType::StaticClass());
 				}
 				break;
@@ -564,7 +566,7 @@ void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor
 				case SurfaceType3:
 				{
 					//Arm
-					UGameplayStatics::ApplyPointDamage(DamageActor, ServerPrimaryWeapon->BaseDamage * 0.8, HitFromDirection, HitInfo, GetController(),
+					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 0.8, HitFromDirection, HitInfo, GetController(),
 						this, UDamageType::StaticClass());
 				}
 				break;
@@ -572,7 +574,7 @@ void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor
 				case SurfaceType4:
 				{
 					//Leg
-					UGameplayStatics::ApplyPointDamage(DamageActor, ServerPrimaryWeapon->BaseDamage * 0.7, HitFromDirection, HitInfo, GetController(),
+					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 0.7, HitFromDirection, HitInfo, GetController(),
 						this, UDamageType::StaticClass());
 				}
 				break;
