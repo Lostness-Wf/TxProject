@@ -884,7 +884,7 @@ void AFPSCharacterBase::ServerFireSniperWeapon_Implementation(FVector CameraLoca
 		ActionInfo.ExecutionFunction = TEXT("DelaySniperShootCallBack");
 		ActionInfo.UUID = FMath::Rand();
 		ActionInfo.Linkage = 0;
-		UKismetSystemLibrary::Delay(this, ClientPrimaryWeapon->ClientArmsFireMontage->GetPlayLength(), ActionInfo);
+		UKismetSystemLibrary::Delay(this, ClientPrimaryWeapon->ClientArmsFireMontage->GetPlayLength() / 1.5, ActionInfo);
 	}
 
 	IsFiring = true;
@@ -917,7 +917,7 @@ void AFPSCharacterBase::ServerReloadPrimary_Implementation()
 			ActionInfo.ExecutionFunction = TEXT("DelayPlayArmReloadCallBack");
 			ActionInfo.UUID = FMath::Rand();
 			ActionInfo.Linkage = 0;
-			UKismetSystemLibrary::Delay(this, ClientPrimaryWeapon->ClientArmsReloadMontage->GetPlayLength(), ActionInfo);
+			UKismetSystemLibrary::Delay(this, ClientPrimaryWeapon->ClientArmsReloadMontage->GetPlayLength() / 1.5, ActionInfo);
 		}
 	}
 }
@@ -945,7 +945,7 @@ void AFPSCharacterBase::ServerReloadSecondary_Implementation()
 			ActionInfo.ExecutionFunction = TEXT("DelayPlayArmReloadCallBack");
 			ActionInfo.UUID = FMath::Rand();
 			ActionInfo.Linkage = 0;
-			UKismetSystemLibrary::Delay(this, ClientSecondaryWeapon->ClientArmsReloadMontage->GetPlayLength(), ActionInfo);
+			UKismetSystemLibrary::Delay(this, ClientSecondaryWeapon->ClientArmsReloadMontage->GetPlayLength() / 1.5, ActionInfo);
 		}
 	}
 }
@@ -1197,8 +1197,9 @@ void AFPSCharacterBase::ClientReload_Implementation()
 		//Temp
 		//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("ClientReload")));
 		UAnimMontage* ClientArmsFireMontage = CurrentClientWeapon->ClientArmsReloadMontage;
-		ClientArmsAnimBP->Montage_Play(ClientArmsFireMontage);
+		ClientArmsAnimBP->Montage_Play(ClientArmsFireMontage, 1.5);
 		CurrentClientWeapon->PlayReloadAnimation();
+		UGameplayStatics::PlaySound2D(GetWorld(), CurrentClientWeapon->ReloadSound);
 	}
 }
 
@@ -1210,6 +1211,7 @@ void AFPSCharacterBase::ClientAiming_Implementation()
 	{
 		ClientPrimaryWeapon->SetActorHiddenInGame(true);
 		PlayerCamera->SetFieldOfView(ClientPrimaryWeapon->AimingFOV);
+		UGameplayStatics::PlaySound2D(GetWorld(), ClientPrimaryWeapon->AnimInSound);
 	}
 
 	WidgetScope = CreateWidget<UUserWidget>(GetWorld(), SniperScopeBPClass);
@@ -1224,6 +1226,7 @@ void AFPSCharacterBase::ClientEndAiming_Implementation()
 	{
 		ClientPrimaryWeapon->SetActorHiddenInGame(false);
 		PlayerCamera->SetFieldOfView(90);
+		UGameplayStatics::PlaySound2D(GetWorld(), ClientPrimaryWeapon->AnimOutSound);
 	}
 
 	if (WidgetScope)

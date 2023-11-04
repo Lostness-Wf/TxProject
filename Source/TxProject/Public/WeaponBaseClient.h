@@ -39,6 +39,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	float AimingFOV;
 
+	UPROPERTY(EditAnywhere)
+	USoundBase* AnimInSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* AnimOutSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundBase* ReloadSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
