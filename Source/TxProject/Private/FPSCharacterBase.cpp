@@ -155,11 +155,11 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	
-	InputComponent->BindAxis(TEXT("MoveRight"), this, &AFPSCharacterBase::MoveRight);
-	InputComponent->BindAxis(TEXT("MoveForward"), this, &AFPSCharacterBase::MoveForward);
+	//InputComponent->BindAxis(TEXT("MoveRight"), this, &AFPSCharacterBase::MoveRight);
+	//InputComponent->BindAxis(TEXT("MoveForward"), this, &AFPSCharacterBase::MoveForward);
 
-	InputComponent->BindAxis(TEXT("Turn"), this, &AFPSCharacterBase::AddControllerYawInput);
-	InputComponent->BindAxis(TEXT("LookUp"), this, &AFPSCharacterBase::AddControllerPitchInput);
+	InputComponent->BindAxis(TEXT("Turn"), this, &AFPSCharacterBase::Turn);
+	InputComponent->BindAxis(TEXT("LookUp"), this, &AFPSCharacterBase::LookUp);
 
 	InputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AFPSCharacterBase::JumpAction);
 	InputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AFPSCharacterBase::StopJumpAction);
@@ -1253,6 +1253,16 @@ void AFPSCharacterBase::MoveRight(float AxisValue)
 void AFPSCharacterBase::MoveForward(float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector(), AxisValue, false);
+}
+
+void AFPSCharacterBase::Turn(float AxisValue)
+{
+	AddControllerYawInput(AxisValue);
+}
+
+void AFPSCharacterBase::LookUp(float AxisValue)
+{
+	AddControllerPitchInput(AxisValue);
 }
 
 void AFPSCharacterBase::JumpAction()

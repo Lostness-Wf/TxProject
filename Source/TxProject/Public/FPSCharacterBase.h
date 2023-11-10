@@ -49,6 +49,9 @@ protected:
 	void MoveRight(float AxisValue);
 	void MoveForward(float AxisValue);
 
+	void Turn(float AxisValue);
+	void LookUp(float AxisValue);
+
 	UFUNCTION(BlueprintCallable)
 	void JumpAction();
 
