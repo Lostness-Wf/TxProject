@@ -46,11 +46,17 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void MoveRight(float AxisValue);
-	void MoveForward(float AxisValue);
+	UFUNCTION(BlueprintCallable)
+	void InputMoveRight(float AxisValue);
 
-	void Turn(float AxisValue);
-	void LookUp(float AxisValue);
+	UFUNCTION(BlueprintCallable)
+	void InputMoveForward(float AxisValue);
+
+	UFUNCTION(BlueprintCallable)
+	void InputTurn(float AxisValue);
+
+	UFUNCTION(BlueprintCallable)
+	void InputLookUp(float AxisValue);
 
 	UFUNCTION(BlueprintCallable)
 	void JumpAction();
@@ -58,7 +64,10 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void StopJumpAction();
 
+	UFUNCTION(BlueprintCallable)
 	void LowSpeedWalkAction();
+
+	UFUNCTION(BlueprintCallable)
 	void NormalSpeedWalkAction();
 
 	UFUNCTION(BlueprintCallable)

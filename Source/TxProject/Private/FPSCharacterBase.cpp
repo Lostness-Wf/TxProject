@@ -158,22 +158,22 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	//InputComponent->BindAxis(TEXT("MoveRight"), this, &AFPSCharacterBase::MoveRight);
 	//InputComponent->BindAxis(TEXT("MoveForward"), this, &AFPSCharacterBase::MoveForward);
 
-	InputComponent->BindAxis(TEXT("Turn"), this, &AFPSCharacterBase::Turn);
-	InputComponent->BindAxis(TEXT("LookUp"), this, &AFPSCharacterBase::LookUp);
+	//InputComponent->BindAxis(TEXT("Turn"), this, &AFPSCharacterBase::Turn);
+	//InputComponent->BindAxis(TEXT("LookUp"), this, &AFPSCharacterBase::LookUp);
 
-	InputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AFPSCharacterBase::JumpAction);
-	InputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AFPSCharacterBase::StopJumpAction);
+	//InputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AFPSCharacterBase::JumpAction);
+	//InputComponent->BindAction(TEXT("Jump"), IE_Released, this, &AFPSCharacterBase::StopJumpAction);
 
-	InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Pressed, this, &AFPSCharacterBase::LowSpeedWalkAction);
-	InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Released, this, &AFPSCharacterBase::NormalSpeedWalkAction);
+	//InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Pressed, this, &AFPSCharacterBase::LowSpeedWalkAction);
+	//InputComponent->BindAction(TEXT("LowSpeedWalk"), IE_Released, this, &AFPSCharacterBase::NormalSpeedWalkAction);
 
-	InputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AFPSCharacterBase::InputFirePressed);
-	InputComponent->BindAction(TEXT("Fire"), IE_Released, this, &AFPSCharacterBase::InputFireReleased);
+	//InputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AFPSCharacterBase::InputFirePressed);
+	//InputComponent->BindAction(TEXT("Fire"), IE_Released, this, &AFPSCharacterBase::InputFireReleased);
 
-	InputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AFPSCharacterBase::InputReload);
+	//InputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AFPSCharacterBase::InputReload);
 
-	InputComponent->BindAction(TEXT("Aiming"), IE_Pressed, this, &AFPSCharacterBase::InputAimingPressed);
-	InputComponent->BindAction(TEXT("Aiming"), IE_Released, this, &AFPSCharacterBase::InputAimingReleased);
+	//InputComponent->BindAction(TEXT("Aiming"), IE_Pressed, this, &AFPSCharacterBase::InputAimingPressed);
+	//InputComponent->BindAction(TEXT("Aiming"), IE_Released, this, &AFPSCharacterBase::InputAimingReleased);
 }
 
 
@@ -1245,22 +1245,22 @@ void AFPSCharacterBase::ClientDeathMatchDeath_Implementation()
 	}
 }
 
-void AFPSCharacterBase::MoveRight(float AxisValue)
+void AFPSCharacterBase::InputMoveRight(float AxisValue)
 {
 	AddMovementInput(GetActorRightVector(), AxisValue, false);
 }
 
-void AFPSCharacterBase::MoveForward(float AxisValue)
+void AFPSCharacterBase::InputMoveForward(float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector(), AxisValue, false);
 }
 
-void AFPSCharacterBase::Turn(float AxisValue)
+void AFPSCharacterBase::InputTurn(float AxisValue)
 {
 	AddControllerYawInput(AxisValue);
 }
 
-void AFPSCharacterBase::LookUp(float AxisValue)
+void AFPSCharacterBase::InputLookUp(float AxisValue)
 {
 	AddControllerPitchInput(AxisValue);
 }
