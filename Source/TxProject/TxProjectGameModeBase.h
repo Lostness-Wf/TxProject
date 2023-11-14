@@ -6,12 +6,19 @@
 #include "GameFramework/GameModeBase.h"
 #include "TxProjectGameModeBase.generated.h"
 
-/**
- * 
- */
+class AAIController_DeathMatch;
+
 UCLASS()
 class TXPROJECT_API ATxProjectGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	ATxProjectGameModeBase();
+
+	UFUNCTION(BlueprintCallable)
+	AAIController_DeathMatch* CreateAIController();
+
+	UFUNCTION(BlueprintCallable)
+	void CreatAIAttacker();
 };
