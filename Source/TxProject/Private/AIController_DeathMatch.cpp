@@ -9,6 +9,7 @@
 #include "FPSCharacterBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "AIModule/Classes/BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
+#include "EngineUtils.h"
 
 AAIController_DeathMatch::AAIController_DeathMatch()
 {
@@ -76,6 +77,11 @@ void AAIController_DeathMatch::ShootEnemy()
 				{
 					bCanFire = true;
 				}
+				else if (AIAttacker->ServerPrimaryWeapon && AIAttacker->ServerPrimaryWeapon->ClipCurrentAmmo <= 0 && !AIAttacker->IsReloading)
+				{
+					bCanFire = false;
+					AIAttacker->InputReload();
+				}
 			}
 		}
 
@@ -93,6 +99,31 @@ AFPSCharacterBase* AAIController_DeathMatch::GetEnemy()
 	return nullptr;
 }
 
+ABunker* AAIController_DeathMatch::CalcPointNearEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker)
+{
+	float BestDisSq = MAX_FLT;
+	ABunker* BestActor = SpActor;
+	const FVector SpLoc = SpActor->GetActorLocation();
+	
+}
+
+ABunker* AAIController_DeathMatch::FindPointNear(FVector Loc)
+{
+	float BestDisSq = MAX_FLT;
+	ABunker* BestActor = nullptr;
+	for (TActorIterator<ABunker>it(GetWorld()); it; it++)
+	{
+		const float Dis = (Loc - it->GetActorLocation()).SizeSquared();
+		if (Dis < BestDisSq)
+		{
+			BestDisSq = Dis;
+			BestActor = *it;
+		}
+	}
+
+	return BestActor;
+}
+
 bool AAIController_DeathMatch::HasEnemy(AActor* Enemy)
 {
 	static FName Tag = FName(TEXT("HasEnemy"));
@@ -101,7 +132,7 @@ bool AAIController_DeathMatch::HasEnemy(AActor* Enemy)
 
 	APawn* AIAttacker = GetPawn();
 	FVector Start = AIAttacker->GetActorLocation();
-	Start.Z += 88;
+	Start.Z += 90;
 	const FVector End = Enemy->GetActorLocation();
 
 	FHitResult HitResult(ForceInit);

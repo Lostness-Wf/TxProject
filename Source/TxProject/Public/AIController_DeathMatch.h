@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "AIController_DeathMatch.generated.h"
+#include "Bunker.h"
 
 class UBlackboardComponent;
 class UBehaviorTreeComponent;
@@ -30,6 +31,10 @@ public:
 	AFPSCharacterBase* GetEnemy();
 
 private:
+	ABunker* CalcPointNearEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker);
+	ABunker* FindPointNear(FVector Loc);
+	FVector CalcPointFarEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker);
+
 	bool HasEnemy(AActor* Enemy);
 	void SetEnemy(APawn* InPawn);
 
