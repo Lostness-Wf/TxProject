@@ -89,6 +89,11 @@ void AAIController_DeathMatch::ShootEnemy()
 	}
 }
 
+//ABunker* AAIController_DeathMatch::FindSplineActor()
+//{
+//
+//}
+
 AFPSCharacterBase* AAIController_DeathMatch::GetEnemy()
 {
 	if (BBComp)
@@ -99,19 +104,76 @@ AFPSCharacterBase* AAIController_DeathMatch::GetEnemy()
 	return nullptr;
 }
 
+FVector AAIController_DeathMatch::GetOrigin(AFPSCharacterBase* Enemy, APawn* AIAttacker)
+{
+	ABunker* SpActor = FindPointNear(AIAttacker->GetActorLocation());
+	if (SpActor)
+	{
+		if (!HasEnemy(Enemy))
+		{
+			SpActor = CalcPointNearEnemy(SpActor, Enemy, AIAttacker);
+		}
+		return CalcPointFarEnemy(SpActor, Enemy, AIAttacker);
+	}
+
+	return FVector::ZeroVector;
+}
+
 ABunker* AAIController_DeathMatch::CalcPointNearEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker)
 {
 	float BestDisSq = MAX_FLT;
 	ABunker* BestActor = SpActor;
 	const FVector SpLoc = SpActor->GetActorLocation();
-	
+	const FVector EnemyLoc = Enemy->GetActorLocation();
+	const FVector AILoc = AIAttacker->GetActorLocation();
+
+	const float SpToEnemyDis = (EnemyLoc - SpLoc).Size();
+	const float AIToEnemyDis = (AILoc - EnemyLoc).Size();
+
+	const ABunker* NearSpForEnemy = FindPointNear(EnemyLoc);
+	const float AIToNearActorForEnemyDis = (AILoc - NearSpForEnemy->GetActorLocation()).Size();
+	const float DisValue = abs(AIToNearActorForEnemyDis - AIToEnemyDis);
+
+	for (TActorIterator<ABunker>it(GetWorld()); it; ++it)
+	{
+		if (*it != SpActor)
+		{
+			const float Dis = (EnemyLoc - it->GetActorLocation()).Size();
+			if (Dis < SpToEnemyDis)
+			{
+				const float SplineDis = (SpLoc - it->GetActorLocation()).Size();
+				if (SplineDis < BestDisSq)
+				{
+					const float AIToItDis = (AILoc - it->GetActorLocation()).Size();
+					if (AIToItDis <= AIToNearActorForEnemyDis)
+					{
+						if (*it == NearSpForEnemy)
+						{
+							if (AIToNearActorForEnemyDis < AIToEnemyDis && DisValue > 500.0f)
+							{
+								BestDisSq = SplineDis;
+								BestActor = *it;
+							}
+						}
+						else
+						{
+							BestDisSq = SplineDis;
+							BestActor = *it;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return BestActor;
 }
 
 ABunker* AAIController_DeathMatch::FindPointNear(FVector Loc)
 {
 	float BestDisSq = MAX_FLT;
 	ABunker* BestActor = nullptr;
-	for (TActorIterator<ABunker>it(GetWorld()); it; it++)
+	for (TActorIterator<ABunker>it(GetWorld()); it; ++it)
 	{
 		const float Dis = (Loc - it->GetActorLocation()).SizeSquared();
 		if (Dis < BestDisSq)
@@ -122,6 +184,39 @@ ABunker* AAIController_DeathMatch::FindPointNear(FVector Loc)
 	}
 
 	return BestActor;
+}
+
+FVector AAIController_DeathMatch::CalcPointFarEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker)
+{
+	float MinDisSq = 0.0f;
+	FVector MinDisVec = FVector::ZeroVector;
+	FVector Point= FVector::ZeroVector;
+	const FVector EnemyLoc = Enemy->GetActorLocation();
+	const FVector AILoc = AIAttacker->GetActorLocation();
+
+	USplineComponent* SpComp = SpActor->GetSplineComp();
+	for (int32 Count = 0; Count < SpComp->GetNumberOfSplinePoints() - 1; Count++)
+	{
+		Point = SpComp->GetLocationAtSplinePoint(Count, ESplineCoordinateSpace::World);
+		const float DisSq = (EnemyLoc - Point).SizeSquared();
+		if (DisSq > MinDisSq)
+		{
+			MinDisSq = DisSq;
+			MinDisVec = Point;
+		}
+	}
+
+	const ABunker* NearActor = FindPointNear(EnemyLoc);
+	if (NearActor == SpActor)
+	{
+		const FVector NearActorLoc = NearActor->GetActorLocation();
+		if ((EnemyLoc - NearActorLoc).Size() > 2000.0f)
+		{
+			MinDisVec = EnemyLoc + 1500.0f * (AILoc - EnemyLoc).GetSafeNormal();
+		}
+	}
+
+	return MinDisVec;
 }
 
 bool AAIController_DeathMatch::HasEnemy(AActor* Enemy)

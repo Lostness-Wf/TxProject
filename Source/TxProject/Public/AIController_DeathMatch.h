@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
-#include "AIController_DeathMatch.generated.h"
 #include "Bunker.h"
+#include "AIController_DeathMatch.generated.h"
 
 class UBlackboardComponent;
 class UBehaviorTreeComponent;
@@ -28,8 +28,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Behavior")
 	void ShootEnemy();
 
+	//UFUNCTION(BlueprintCallable, Category = "Behavior")
+	//ABunker* FindSplineActor();
+
 	AFPSCharacterBase* GetEnemy();
 
+	FVector GetOrigin(AFPSCharacterBase* Enemy, APawn* AIAttacker);
 private:
 	ABunker* CalcPointNearEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker);
 	ABunker* FindPointNear(FVector Loc);
