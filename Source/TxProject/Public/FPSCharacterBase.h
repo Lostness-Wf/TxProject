@@ -42,7 +42,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	EWeaponType TestStartWeapon;
 
-protected:
+public:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -96,7 +96,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateFPArmsBlendPose(int NewIndex);
 
-private:
+public:
 	UPROPERTY(meta = (AllowPrivateAccess = "true"))
 	AWeaponBaseServer* ServerPrimaryWeapon;
 
@@ -216,7 +216,8 @@ private:
 	UFUNCTION()
 	void OnHit(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
 
-	float Health;
+	UPROPERTY(EditAnywhere)
+	float Health = 100;
 
 	void DeathMatchDeath(AActor* DamageCauser);
 

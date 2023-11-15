@@ -6,9 +6,8 @@
 #include "FPSCharacterBase.h"
 #include "AIAttacker.generated.h"
 
-/**
- * 
- */
+class UBehaviorTree;
+
 UCLASS()
 class TXPROJECT_API AAIAttacker : public AFPSCharacterBase
 {
@@ -16,4 +15,7 @@ class TXPROJECT_API AAIAttacker : public AFPSCharacterBase
 	
 public:
 	AAIAttacker();
+
+	UPROPERTY(EditDefaultsOnly, Category = "BehaviorTree")
+	UBehaviorTree* AttackerBT;
 };

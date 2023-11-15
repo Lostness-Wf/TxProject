@@ -63,7 +63,6 @@ void AFPSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Health = 100;
 	IsAiming = false;
 	IsFiring = false;
 	IsReloading = false;
@@ -521,6 +520,7 @@ void AFPSCharacterBase::SniperLineTrace(FVector CameraLocation, FRotator CameraR
 		if (FPSCharacter)
 		{
 			//打到玩家应用伤害
+			//UKismetSystemLibrary::PrintString(GetWorld(), FString::Printf(TEXT("Hit actor name : %s"), *HitResult.GetActor()->GetName()));
 			DamagePlayer(HitResult.PhysMaterial.Get(), HitResult.GetActor(), CameraLocation, HitResult);
 		}
 		else
@@ -583,7 +583,7 @@ void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor
 
 }
 
-void AFPSCharacterBase::OnHit(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser)
+void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser)
 {
 	Health -= Damage;
 
