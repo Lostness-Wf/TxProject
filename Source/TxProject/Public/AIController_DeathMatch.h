@@ -22,8 +22,9 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
+	//AFPSCharacterBase* Enemy
 	UFUNCTION(BlueprintCallable, Category = "Behavior")
-	void FindEnemy(AFPSCharacterBase* Enemy);
+	void FindEnemy();
 
 	UFUNCTION(BlueprintCallable, Category = "Behavior")
 	void ShootEnemy();

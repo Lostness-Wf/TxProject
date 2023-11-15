@@ -45,7 +45,7 @@ void AAIController_DeathMatch::OnUnPossess()
 	BTComp->StopTree();
 }
 
-void AAIController_DeathMatch::FindEnemy(AFPSCharacterBase* Enemy)
+void AAIController_DeathMatch::FindEnemy()
 {
 	AAIAttacker* AIAttacker = Cast<AAIAttacker>(GetPawn());
 	if (AIAttacker)
