@@ -73,6 +73,7 @@ void AFPSCharacterBase::BeginPlay()
 
 	ClientArmsAnimBP = FPArmsMesh->GetAnimInstance();
 	ServerBodysAnimBP = GetMesh()->GetAnimInstance();
+	StartWithKindOfWeapon();
 
 	FPSPlayerController = Cast<AMultiFPSPlayerController>(GetController());
 
@@ -90,7 +91,6 @@ void AFPSCharacterBase::BeginPlay()
 		UKismetSystemLibrary::Delay(this, 0.5, ActionInfo);
 	}
 
-	StartWithKindOfWeapon();
 }
 
 void AFPSCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
