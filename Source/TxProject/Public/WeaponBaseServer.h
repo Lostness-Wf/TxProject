@@ -122,7 +122,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "SpreadWeaponData")
 	float SpreadWeaponMaxIndex;
 
-	UFUNCTION(Server, Reliable, WithValidation)
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void MultiShootingEffect();
 	void MultiShootingEffect_Implementation();
 	bool MultiShootingEffect_Validation();

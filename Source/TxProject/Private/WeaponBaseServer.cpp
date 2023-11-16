@@ -89,9 +89,8 @@ void AWeaponBaseServer::MultiShootingEffect_Implementation()
 			FRotator::ZeroRotator, FVector::OneVector,
 			EAttachLocation::KeepRelativeOffset, true, EPSCPoolMethod::None,
 			true);
-
-
-	}UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GetActorLocation());
+	}
 }
 
 bool AWeaponBaseServer::MultiShootingEffect_Validate()
