@@ -18,7 +18,7 @@ EBTNodeResult::Type UBTTask_GetPosition::ExecuteTask(UBehaviorTreeComponent& Own
 		if (AIAttacker && Enemy)
 		{
 			const FVector Origin = ALC->GetOrigin(Enemy, AIAttacker);
-			const float Radius = 150.0f;
+			const float Radius = 200.0f;
 
 			UNavigationSystemV1* NavMesh = FNavigationSystem::GetCurrent<UNavigationSystemV1>(ALC);
 			if (NavMesh)

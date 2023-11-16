@@ -35,6 +35,9 @@ public:
 	AFPSCharacterBase* GetEnemy();
 
 	FVector GetOrigin(AFPSCharacterBase* Enemy, APawn* AIAttacker);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
+	void DeathMatchDeath(AActor* DamageActor);
 private:
 	ABunker* CalcPointNearEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker);
 	ABunker* FindPointNear(FVector Loc);

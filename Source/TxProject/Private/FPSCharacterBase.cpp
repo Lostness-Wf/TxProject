@@ -11,6 +11,7 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Net/UnrealNetwork.h"
 #include "UMG/Public/Blueprint/UserWidget.h"
+#include "AIController_DeathMatch.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -21,6 +22,7 @@ AFPSCharacterBase::AFPSCharacterBase()
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	if (PlayerCamera)
 	{
+		PlayerCamera->SetupAttachment(RootComponent);
 		PlayerCamera->SetupAttachment(RootComponent);
 		PlayerCamera->bUsePawnControlRotation = true;
 	}
@@ -621,6 +623,12 @@ void AFPSCharacterBase::DeathMatchDeath(AActor* DamageActor)
 	if (MultiFPSPlayerController)
 	{
 		MultiFPSPlayerController->DeathMatchDeath(DamageActor);
+	}
+
+	AAIController_DeathMatch* AIController = Cast<AAIController_DeathMatch>(GetController());
+	if (AIController)
+	{
+		AIController->DeathMatchDeath(DamageActor);
 	}
 }
 
