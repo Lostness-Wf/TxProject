@@ -26,7 +26,7 @@ public:
 	void UpdateAmmoUI(int32 ClipCurrentAmmo, int32 GunCurrentAmmo);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "PlayerUI")
-	void UpdateHealthUI(float NewHealth);
+	void UpdateHealthUI(float NewHealth, AActor* DamageActor);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
 	void DeathMatchDeath(AActor* DamageActor);

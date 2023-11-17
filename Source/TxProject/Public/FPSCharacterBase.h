@@ -314,7 +314,7 @@ public:
 
 	//客户端更新血量UI
 	UFUNCTION(Client, Reliable)
-	void ClientUpdateHealthUI(float NewHealth);
+	void ClientUpdateHealthUI(float NewHealth, AActor* DamageActor);
 
 	//客户端射击后坐力旋转镜头
 	UFUNCTION(Client, Reliable)

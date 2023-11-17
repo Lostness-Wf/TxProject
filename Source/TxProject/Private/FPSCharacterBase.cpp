@@ -589,7 +589,7 @@ void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AContro
 {
 	Health -= Damage;
 
-	ClientUpdateHealthUI(Health);
+	ClientUpdateHealthUI(Health, DasmagedActor);
 
 	if (Health <= 0)
 	{
@@ -1152,11 +1152,11 @@ void AFPSCharacterBase::ClientUpdateAmmoUI_Implementation(int32 ClipCurrentAmmo,
 	}
 }
 
-void AFPSCharacterBase::ClientUpdateHealthUI_Implementation(float NewHealth)
+void AFPSCharacterBase::ClientUpdateHealthUI_Implementation(float NewHealth, AActor* DamageActor)
 {
 	if (FPSPlayerController)
 	{
-		FPSPlayerController->UpdateHealthUI(NewHealth);
+		FPSPlayerController->UpdateHealthUI(NewHealth, DamageActor);
 	}
 }
 
