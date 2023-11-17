@@ -589,7 +589,7 @@ void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AContro
 {
 	Health -= Damage;
 
-	ClientUpdateHealthUI(Health, DasmagedActor);
+	ClientUpdateHealthUI(Health, DamageCauser);
 
 	if (Health <= 0)
 	{
