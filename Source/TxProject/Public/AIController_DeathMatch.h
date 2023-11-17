@@ -38,6 +38,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
 	void DeathMatchDeath(AActor* DamageActor);
+
+	UFUNCTION(BlueprintCallable, Category = "Behavior")
+	void StopBehavior();
 private:
 	ABunker* CalcPointNearEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker);
 	ABunker* FindPointNear(FVector Loc);

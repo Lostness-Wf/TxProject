@@ -216,8 +216,11 @@ public:
 	UFUNCTION()
 	void OnHit(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Health")
 	float Health = 100;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool IsDead = false;
 
 	void DeathMatchDeath(AActor* DamageCauser);
 

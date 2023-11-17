@@ -594,6 +594,7 @@ void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AContro
 	if (Health <= 0)
 	{
 		//½ÇÉ«ËÀÍö
+		IsDead = true;
 		DeathMatchDeath(DamageCauser);
 	}
 

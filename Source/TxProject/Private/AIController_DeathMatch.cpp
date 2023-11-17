@@ -119,6 +119,14 @@ FVector AAIController_DeathMatch::GetOrigin(AFPSCharacterBase* Enemy, APawn* AIA
 	return FVector::ZeroVector;
 }
 
+void AAIController_DeathMatch::StopBehavior()
+{
+	AAIAttacker* AIAttacker = Cast<AAIAttacker>(GetPawn());
+	AIAttacker->InputFireReleased();
+	BTComp->StopTree();
+	ClearFocus(EAIFocusPriority::LastFocusPriority);
+}
+
 ABunker* AAIController_DeathMatch::CalcPointNearEnemy(ABunker* SpActor, AFPSCharacterBase* Enemy, APawn* AIAttacker)
 {
 	float BestDisSq = MAX_FLT;
