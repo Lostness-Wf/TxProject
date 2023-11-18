@@ -555,10 +555,10 @@ void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor
 					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 4, HitFromDirection, HitInfo, GetController(),
 						this, UDamageType::StaticClass());
 
-					AFPSCharacterBase* Attacker = Cast<AFPSCharacterBase>(DamageActor);
-					if (Attacker)
+					AFPSCharacterBase* DamageActor = Cast<AFPSCharacterBase>(DamageActor);
+					if (DamageActor)
 					{
-						Attacker->MultPlayHeadSound();
+						DamageActor->ClientPlayHeadSound();
 					}
 				}
 				break;
@@ -609,13 +609,13 @@ void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AContro
 
 }
 
-void AFPSCharacterBase::MultPlayHeadSound_Implementation()
+void AFPSCharacterBase::ClientPlayHeadSound_Implementation()
 {
 	UGameplayStatics::PlaySound2D(GetWorld(), HeadSound);
 	UE_LOG(LogTemp, Warning, TEXT("11"));
 }
 
-bool AFPSCharacterBase::MultPlayHeadSound_Validate()
+bool AFPSCharacterBase::ClientPlayHeadSound_Validate()
 {
 	return true;
 }
