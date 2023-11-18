@@ -222,6 +222,14 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	bool IsDead = false;
 
+	UPROPERTY(EditAnywhere,Category = "Sound")
+	USoundBase* HeadSound;
+
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MultPlayHeadSound();
+	void MultPlayHeadSound_Implementation();
+	void MultPlayHeadSound_Validation();
+
 	void DeathMatchDeath(AActor* DamageCauser);
 
 public:

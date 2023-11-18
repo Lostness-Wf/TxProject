@@ -554,6 +554,12 @@ void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor
 					//Head
 					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 4, HitFromDirection, HitInfo, GetController(),
 						this, UDamageType::StaticClass());
+
+					AFPSCharacterBase* Attacker = Cast<AFPSCharacterBase>(DamageActor);
+					if (Attacker)
+					{
+						Attacker->MultPlayHeadSound();
+					}
 				}
 				break;
 		
@@ -601,6 +607,17 @@ void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AContro
 	//Temp
 	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("PlayerName : %s Health : %f"),*GetName(), Health));
 
+}
+
+void AFPSCharacterBase::MultPlayHeadSound_Implementation()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), HeadSound);
+	UE_LOG(LogTemp, Warning, TEXT("11"));
+}
+
+bool AFPSCharacterBase::MultPlayHeadSound_Validate()
+{
+	return true;
 }
 
 void AFPSCharacterBase::DeathMatchDeath(AActor* DamageActor)
