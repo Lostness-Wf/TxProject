@@ -21,10 +21,18 @@ struct FDeathMatchPlayerData
 	UPROPERTY(BlueprintReadWrite)
 	int PlayerScore;
 
+	UPROPERTY(BlueprintReadWrite)
+	int Kill;
+
+	UPROPERTY(BlueprintReadWrite)
+	int Death;
+
 	FDeathMatchPlayerData()
 	{
 		PlayerName = " ";
 		PlayerScore = 0;
+		Kill = 0;
+		Death = 0;
 	}
 };
 
