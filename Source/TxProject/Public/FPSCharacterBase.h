@@ -225,10 +225,10 @@ public:
 	UPROPERTY(EditAnywhere,Category = "Sound")
 	USoundBase* HeadSound;
 
-	UFUNCTION(Client, Reliable, WithValidation)
-	void ClientPlayHeadSound();
-	void ClientPlayHeadSound_Implementation();
-	void ClientPlayHeadSound_Validation();
+	UFUNCTION(NetMulticast, Reliable, WithValidation)
+	void MulticastPlayHeadSound();
+	void MulticastPlayHeadSound_Implementation();
+	void MulticastPlayHeadSound_Validation();
 
 	void DeathMatchDeath(AActor* DamageCauser);
 
