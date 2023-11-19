@@ -45,7 +45,7 @@ void AWeaponBaseServer::OnOtherBeginOverlap(UPrimitiveComponent* OverlappedCompo
 		}
 		else
 		{
-		FPSCharacter->EquipPrimary(this);
+			FPSCharacter->EquipPrimary(this);
 		}
 	}
 }

@@ -16,7 +16,7 @@
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
@@ -39,6 +39,7 @@ AFPSCharacterBase::AFPSCharacterBase()
 	//第三人称骨骼碰撞
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	GetMesh()->SetCollisionObjectType(ECC_Pawn);
+
 }
 
 void AFPSCharacterBase::DelayBeginPlayCallBack()
@@ -64,6 +65,7 @@ void AFPSCharacterBase::DelayBeginPlayCallBack()
 void AFPSCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+	StartWithKindOfWeapon();
 
 	IsAiming = false;
 	IsFiring = false;
@@ -73,9 +75,9 @@ void AFPSCharacterBase::BeginPlay()
 
 	ClientArmsAnimBP = FPArmsMesh->GetAnimInstance();
 	ServerBodysAnimBP = GetMesh()->GetAnimInstance();
-	StartWithKindOfWeapon();
 
 	FPSPlayerController = Cast<AMultiFPSPlayerController>(GetController());
+
 
 	if (FPSPlayerController)
 	{
@@ -112,11 +114,18 @@ void AFPSCharacterBase::EquipPrimary(AWeaponBaseServer* WeaponBaseServer)
 	{
 		ServerPrimaryWeapon = WeaponBaseServer;
 		ServerPrimaryWeapon->SetOwner(this);
-		ServerPrimaryWeapon->K2_AttachToComponent(GetMesh(), TEXT("Weapon_Right"),
-			EAttachmentRule::SnapToTarget,
-			EAttachmentRule::SnapToTarget,
-			EAttachmentRule::SnapToTarget,
-			true);
+		if (GetMesh())
+		{
+			ServerPrimaryWeapon->K2_AttachToComponent(GetMesh(), TEXT("Weapon_Right"),
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::SnapToTarget,
+				true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Mesh is nullptr"))
+		}
 		ClientEquipFPArmsPriamry();
 		ActiveWeapon = ServerPrimaryWeapon->KindOfWeapon;
 		ClientUpdateAmmoUI(ServerPrimaryWeapon->ClipCurrentAmmo, ServerPrimaryWeapon->GunCurrentAmmo);
@@ -155,7 +164,7 @@ void AFPSCharacterBase::Tick(float DeltaTime)
 void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	
+
 	//InputComponent->BindAxis(TEXT("MoveRight"), this, &AFPSCharacterBase::MoveRight);
 	//InputComponent->BindAxis(TEXT("MoveForward"), this, &AFPSCharacterBase::MoveForward);
 
@@ -180,14 +189,14 @@ void AFPSCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFPSCharacterBase::ResetRecoil()
 {
-	RecoilXCoordPerShoot	  = 0;
+	RecoilXCoordPerShoot = 0;
 
-	NewVerticalRecoilAmount   = 0;
-	OldVerticalRecoilAmount   = 0;
-	VerticalRecoilAmount	  = 0;
+	NewVerticalRecoilAmount = 0;
+	OldVerticalRecoilAmount = 0;
+	VerticalRecoilAmount = 0;
 	NewHorizontalRecoilAmount = 0;
 	OldHorizontalRecoilAmount = 0;
-	HorizontalRecoilAmount	  = 0;
+	HorizontalRecoilAmount = 0;
 }
 
 void AFPSCharacterBase::DelayPlayArmReloadCallBack()
@@ -242,7 +251,7 @@ void AFPSCharacterBase::AutoFire()
 
 		//客户端调用，开枪动画，手臂动画，射击声音，屏幕抖动，后坐力，粒子
 		ClientFire();
-		
+
 		//后坐力
 		ClientRecoil();
 
@@ -256,6 +265,7 @@ void AFPSCharacterBase::AutoFire()
 
 void AFPSCharacterBase::FireWeaponPrimary()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, ServerPrimaryWeapon->GetName());
 	//判断弹夹是否为空
 	if (ServerPrimaryWeapon->ClipCurrentAmmo > 0 && !IsReloading)
 	{
@@ -325,7 +335,7 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 
 	bool HitSuccess = UKismetSystemLibrary::LineTraceSingle(GetWorld(), CameraLocation, EndLocation, ETraceTypeQuery::TraceTypeQuery1, false, IgnoreArray,
 		EDrawDebugTrace::None, HitResult, true, FLinearColor::Red, FLinearColor::Green, 3.f);
-	 
+
 	if (HitSuccess)
 	{
 		//Temp
@@ -340,7 +350,7 @@ void AFPSCharacterBase::RifleLineTrace(FVector CameraLocation, FRotator CameraRo
 		}
 		else
 		{
-			FRotator XRotator =  UKismetMathLibrary::MakeRotFromX(HitResult.Normal);
+			FRotator XRotator = UKismetMathLibrary::MakeRotFromX(HitResult.Normal);
 
 			//组播打到墙壁生成弹孔
 			MultiSpawnBulletDecall(HitResult.Location, XRotator);
@@ -447,6 +457,7 @@ void AFPSCharacterBase::DelaySpreadWeaponShootCallBack()
 
 void AFPSCharacterBase::FireWeaponSniper()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, ServerPrimaryWeapon->GetName());
 	//判断弹夹是否为空
 	if (ServerPrimaryWeapon->ClipCurrentAmmo > 0 && !IsReloading && !IsFiring)
 	{
@@ -548,45 +559,45 @@ void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor
 	if (CurrentServerWeapon)
 	{
 		switch (PhysicalMaterial->SurfaceType)
-			{
-				case SurfaceType1:
-				{
-					//Head
-					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 4, HitFromDirection, HitInfo, GetController(),
-						this, UDamageType::StaticClass());
+		{
+		case SurfaceType1:
+		{
+			//Head
+			UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 4, HitFromDirection, HitInfo, GetController(),
+				this, UDamageType::StaticClass());
 
-					AFPSCharacterBase* HitActor = Cast<AFPSCharacterBase>(DamageActor);
-					if (HitActor)
-					{
-						HitActor->MulticastPlayHeadSound();
-					}
-				}
-				break;
-		
-				case SurfaceType2:
-				{
-					//Body
-					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 1, HitFromDirection, HitInfo, GetController(),
-						this, UDamageType::StaticClass());
-				}
-				break;
-		
-				case SurfaceType3:
-				{
-					//Arm
-					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 0.8, HitFromDirection, HitInfo, GetController(),
-						this, UDamageType::StaticClass());
-				}
-				break;
-		
-				case SurfaceType4:
-				{
-					//Leg
-					UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 0.7, HitFromDirection, HitInfo, GetController(),
-						this, UDamageType::StaticClass());
-				}
-				break;
+			AFPSCharacterBase* HitActor = Cast<AFPSCharacterBase>(DamageActor);
+			if (HitActor)
+			{
+				HitActor->MulticastPlayHeadSound();
 			}
+		}
+		break;
+
+		case SurfaceType2:
+		{
+			//Body
+			UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 1, HitFromDirection, HitInfo, GetController(),
+				this, UDamageType::StaticClass());
+		}
+		break;
+
+		case SurfaceType3:
+		{
+			//Arm
+			UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 0.8, HitFromDirection, HitInfo, GetController(),
+				this, UDamageType::StaticClass());
+		}
+		break;
+
+		case SurfaceType4:
+		{
+			//Leg
+			UGameplayStatics::ApplyPointDamage(DamageActor, CurrentServerWeapon->BaseDamage * 0.7, HitFromDirection, HitInfo, GetController(),
+				this, UDamageType::StaticClass());
+		}
+		break;
+		}
 	}
 
 }
@@ -612,7 +623,6 @@ void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AContro
 void AFPSCharacterBase::MulticastPlayHeadSound_Implementation()
 {
 	UGameplayStatics::PlaySound2D(GetWorld(), HeadSound);
-	UE_LOG(LogTemp, Warning, TEXT("11"));
 }
 
 bool AFPSCharacterBase::MulticastPlayHeadSound_Validate()
@@ -621,11 +631,11 @@ bool AFPSCharacterBase::MulticastPlayHeadSound_Validate()
 }
 
 void AFPSCharacterBase::DeathMatchDeath(AActor* DamageActor)
-{	
+{
 	ClientDeathMatchDeath();
 
 	AWeaponBaseClient* CurrentClientWeapon = GetCurrentClientFPArmsWeaponActor();
-	AWeaponBaseServer* CurrentServerWeapon =  GetCurrentServerTPBodysWeaponActor();
+	AWeaponBaseServer* CurrentServerWeapon = GetCurrentServerTPBodysWeaponActor();
 
 	if (CurrentClientWeapon)
 	{
@@ -657,63 +667,109 @@ void AFPSCharacterBase::StartWithKindOfWeapon()
 		//随机武器
 		PurchaseWeapon(static_cast<EWeaponType>(UKismetMathLibrary::RandomIntegerInRange(0, static_cast<int8>(EWeaponType::EEnd) - 1)));
 	}
+	else
+	{
+		//随机武器
+		//PurchaseWeapon(static_cast<EWeaponType>(UKismetMathLibrary::RandomIntegerInRange(0, static_cast<int8>(EWeaponType::EEnd) - 1)));
+		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, this->GetName());
+	}
 }
 
 void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 {
 	FActorSpawnParameters SpawnInfo;
 	SpawnInfo.Owner = this;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;	
-
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnInfo.bNoFail = true;
 	switch (WeaponType)
 	{
-		case EWeaponType::AK47:
-			{
-				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C'"));
-				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
-				ServerWeapon->EquipWeapon();
-				EquipPrimary(ServerWeapon);
-			}
-			break;
+	case EWeaponType::AK47:
+	{
+		UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Game/Blueprint/Weapon/AK47/BP_AK47_Server.BP_AK47_Server_C"));
+		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+		if (ServerWeapon)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("2"));
+			ServerWeapon->EquipWeapon();
+			EquipPrimary(ServerWeapon);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("111111111111111111111111111111111111111"));
+		}
+	}
+	break;
 
-		case EWeaponType::M4A1:
-			{
-				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/M4A1/BP_M4A1_Server.BP_M4A1_Server_C'"));
-				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
-				ServerWeapon->EquipWeapon();
-				EquipPrimary(ServerWeapon);
-			}
-			break;
+	case EWeaponType::M4A1:
+	{
+		UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Game/Blueprint/Weapon/M4A1/BP_M4A1_Server.BP_M4A1_Server_C"));
+		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+		if (ServerWeapon)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("2"));
+			ServerWeapon->EquipWeapon();
+			EquipPrimary(ServerWeapon);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("1111111111111111111111111111111111111111"));
+		}
+	}
+	break;
 
-		case EWeaponType::MP7:
-			{
-				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/MP7/BP_MP7_Server.BP_MP7_Server_C'"));
-				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
-				ServerWeapon->EquipWeapon();
-				EquipPrimary(ServerWeapon);
-			}
-			break;
+	case EWeaponType::MP7:
+	{
+		UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Game/Blueprint/Weapon/MP7/BP_MP7_Server.BP_MP7_Server_C"));
+		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+		if (ServerWeapon)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("2"));
+			ServerWeapon->EquipWeapon();
+			EquipPrimary(ServerWeapon);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("11111111111111111111111111111111111111111"));
+		}
+	}
+	break;
 
-		case EWeaponType::DesertEagle:
-			{
-				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/DesertEagle/BP_DesertEagle_Server.BP_DesertEagle_Server_C'"));
-				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
-				ServerWeapon->EquipWeapon();
-				EquipSrcondary(ServerWeapon);
-			}
-			break;
+	case EWeaponType::DesertEagle:
+	{
+		UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Game/Blueprint/Weapon/DesertEagle/BP_DesertEagle_Server.BP_DesertEagle_Server_C"));
+		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+		if (ServerWeapon)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("2"));
+			ServerWeapon->EquipWeapon();
+			EquipSrcondary(ServerWeapon);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("1111111111111111111111111111111111111111"));
+		}
+	}
+	break;
 
-		case EWeaponType::Sniper:
-			{
-				UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Script/Engine.Blueprint'/Game/Blueprint/Weapon/Sniper/BP_Sniper_Server.BP_Sniper_Server_C'"));
-				AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
-				ServerWeapon->EquipWeapon();
-				EquipPrimary(ServerWeapon);
-			}
-			break;
+	case EWeaponType::Sniper:
+	{
+		UClass* BlueprintVar = StaticLoadClass(AWeaponBaseServer::StaticClass(), nullptr, TEXT("/Game/Blueprint/Weapon/Sniper/BP_Sniper_Server.BP_Sniper_Server_C"));
+		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
+		if (ServerWeapon)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("2"));
+			ServerWeapon->EquipWeapon();
+			EquipPrimary(ServerWeapon);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("111111111111111111111111111111111"));
+		}
+	}
+	break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 }
 
@@ -721,39 +777,39 @@ AWeaponBaseClient* AFPSCharacterBase::GetCurrentClientFPArmsWeaponActor()
 {
 	switch (ActiveWeapon)
 	{
-		case EWeaponType::AK47:
-			{
-				return ClientPrimaryWeapon;
-			}
-			break;
+	case EWeaponType::AK47:
+	{
+		return ClientPrimaryWeapon;
+	}
+	break;
 
-		case EWeaponType::M4A1:
-			{
-				return ClientPrimaryWeapon;
-			}
-			break;
+	case EWeaponType::M4A1:
+	{
+		return ClientPrimaryWeapon;
+	}
+	break;
 
-		case EWeaponType::MP7:
-			{
-				return ClientPrimaryWeapon;
-			}
-			break;
+	case EWeaponType::MP7:
+	{
+		return ClientPrimaryWeapon;
+	}
+	break;
 
-		case EWeaponType::DesertEagle:
-			{
-				return ClientSecondaryWeapon;
-			}
-			break;
+	case EWeaponType::DesertEagle:
+	{
+		return ClientSecondaryWeapon;
+	}
+	break;
 
-		case EWeaponType::Sniper:
-			{
-				return ClientPrimaryWeapon;
-			}
-			break;
+	case EWeaponType::Sniper:
+	{
+		return ClientPrimaryWeapon;
+	}
+	break;
 
-		default:
-			return nullptr;
-			break;
+	default:
+		return nullptr;
+		break;
 	}
 }
 
@@ -762,39 +818,39 @@ AWeaponBaseServer* AFPSCharacterBase::GetCurrentServerTPBodysWeaponActor()
 	switch (ActiveWeapon)
 	{
 
-		case EWeaponType::AK47:
-			{
-				return ServerPrimaryWeapon;
-			}
-			break;
+	case EWeaponType::AK47:
+	{
+		return ServerPrimaryWeapon;
+	}
+	break;
 
-		case EWeaponType::M4A1:
-			{
-				return ServerPrimaryWeapon;
-			}
-			break;
+	case EWeaponType::M4A1:
+	{
+		return ServerPrimaryWeapon;
+	}
+	break;
 
-		case EWeaponType::MP7:
-			{
-				return ServerPrimaryWeapon;
-			}
-			break;
+	case EWeaponType::MP7:
+	{
+		return ServerPrimaryWeapon;
+	}
+	break;
 
-		case EWeaponType::DesertEagle:
-			{
-				return ServerSecondaryWeapon;
-			}
-			break;
+	case EWeaponType::DesertEagle:
+	{
+		return ServerSecondaryWeapon;
+	}
+	break;
 
-		case EWeaponType::Sniper:
-			{
-				return ServerPrimaryWeapon;
-			}
-			break;
+	case EWeaponType::Sniper:
+	{
+		return ServerPrimaryWeapon;
+	}
+	break;
 
-		default:
-			return nullptr;
-			break;
+	default:
+		return nullptr;
+		break;
 	}
 }
 
@@ -824,10 +880,10 @@ void AFPSCharacterBase::ServerFireRifleWeapon_Implementation(FVector CameraLocat
 	{
 		//特效和声音组播
 		ServerPrimaryWeapon->MultiShootingEffect();
-	
+
 		//子弹数量-1
 		ServerPrimaryWeapon->ClipCurrentAmmo -= 1;
-	
+
 		//播放第三人称身体射击动画
 		MultiShooting();
 
@@ -1023,7 +1079,7 @@ void AFPSCharacterBase::MultiSpawnBulletDecall_Implementation(FVector Location, 
 	AWeaponBaseServer* CurrentServerWeapon = GetCurrentServerTPBodysWeaponActor();
 	if (CurrentServerWeapon)
 	{
-		UDecalComponent* Decal =  UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CurrentServerWeapon->BullteDecalMaterial, FVector(5, 5, 5),
+		UDecalComponent* Decal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), CurrentServerWeapon->BullteDecalMaterial, FVector(5, 5, 5),
 			Location, Rotation, 10);
 
 		if (Decal)
@@ -1063,7 +1119,7 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 	{
 		if (ClientPrimaryWeapon)
 		{
-
+			UE_LOG(LogTemp, Warning, TEXT("ClientPrimaryWeapon"));
 		}
 		else
 		{
@@ -1073,7 +1129,7 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 			ClientPrimaryWeapon = GetWorld()->SpawnActor<AWeaponBaseClient>(ServerPrimaryWeapon->ClientWeaponBaseBPClass,
 				GetActorTransform(),
 				SpawnInfo);
-			
+
 			FName WeaponSocketName = TEXT("WeaponSocket");
 			if (ActiveWeapon == EWeaponType::M4A1)
 			{
@@ -1096,6 +1152,10 @@ void AFPSCharacterBase::ClientEquipFPArmsPriamry_Implementation()
 		{
 			UpdateFPArmsBlendPose(ClientPrimaryWeapon->FPArmsBlendPose);
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ServerPrimaryWeapon si nullptr"));
 	}
 }
 
@@ -1207,7 +1267,7 @@ void AFPSCharacterBase::ClientRecoil_Implementation()
 	{
 		FRotator ControllerRotater = FPSPlayerController->GetControlRotation();
 		FPSPlayerController->SetControlRotation(FRotator(ControllerRotater.Pitch + VerticalRecoilAmount,
-			ControllerRotater.Yaw + HorizontalRecoilAmount,ControllerRotater.Roll));
+			ControllerRotater.Yaw + HorizontalRecoilAmount, ControllerRotater.Roll));
 	}
 
 	OldVerticalRecoilAmount = NewVerticalRecoilAmount;
@@ -1317,37 +1377,37 @@ void AFPSCharacterBase::InputFirePressed()
 {
 	switch (ActiveWeapon)
 	{
-		case EWeaponType::AK47:
-			{
-				FireWeaponPrimary();
-			}
-			break;
+	case EWeaponType::AK47:
+	{
+		FireWeaponPrimary();
+	}
+	break;
 
-		case EWeaponType::DesertEagle:
-			{
-				FireWeaponSecondary();
-			}
-			break;
+	case EWeaponType::DesertEagle:
+	{
+		FireWeaponSecondary();
+	}
+	break;
 
-		case EWeaponType::M4A1:
-			{
-				FireWeaponPrimary();
-			}
-			break;
+	case EWeaponType::M4A1:
+	{
+		FireWeaponPrimary();
+	}
+	break;
 
-		case EWeaponType::MP7:
-			{
-				FireWeaponPrimary();
-			}
-			break;
+	case EWeaponType::MP7:
+	{
+		FireWeaponPrimary();
+	}
+	break;
 
-		case EWeaponType::Sniper:
-			{
-				FireWeaponSniper();
-			}
-			break;
+	case EWeaponType::Sniper:
+	{
+		FireWeaponSniper();
+	}
+	break;
 
-		default:
+	default:
 		break;
 	}
 }
@@ -1356,37 +1416,37 @@ void AFPSCharacterBase::InputFireReleased()
 {
 	switch (ActiveWeapon)
 	{
-		case EWeaponType::AK47:
-			{
-				StopFirePrimary();
-			}
-			break;
+	case EWeaponType::AK47:
+	{
+		StopFirePrimary();
+	}
+	break;
 
-		case EWeaponType::DesertEagle:
-			{
-				StopFireSecondary();
-			}
-			break;
+	case EWeaponType::DesertEagle:
+	{
+		StopFireSecondary();
+	}
+	break;
 
-		case EWeaponType::M4A1:
-			{
-				StopFirePrimary();
-			}
-			break;
+	case EWeaponType::M4A1:
+	{
+		StopFirePrimary();
+	}
+	break;
 
-		case EWeaponType::MP7:
-			{
-				StopFirePrimary();
-			}
-			break;
+	case EWeaponType::MP7:
+	{
+		StopFirePrimary();
+	}
+	break;
 
-		case EWeaponType::Sniper:
-			{
-				StopFireSniper();
-			}
-			break;
+	case EWeaponType::Sniper:
+	{
+		StopFireSniper();
+	}
+	break;
 
-		default:
+	default:
 		break;
 	}
 }
@@ -1401,34 +1461,34 @@ void AFPSCharacterBase::InputReload()
 			switch (ActiveWeapon)
 			{
 			case EWeaponType::AK47:
-				{
-					ServerReloadPrimary();
-				}
-				break;
+			{
+				ServerReloadPrimary();
+			}
+			break;
 
 			case EWeaponType::M4A1:
-				{
-					ServerReloadPrimary();
-				}
-				break;
+			{
+				ServerReloadPrimary();
+			}
+			break;
 
 			case EWeaponType::MP7:
-				{
-					ServerReloadPrimary();
-				}
-				break;
+			{
+				ServerReloadPrimary();
+			}
+			break;
 
 			case EWeaponType::DesertEagle:
-				{
-					ServerReloadSecondary();
-				}
-				break;
+			{
+				ServerReloadSecondary();
+			}
+			break;
 
 			case EWeaponType::Sniper:
-				{
-					ServerReloadPrimary();
-				}
-				break;
+			{
+				ServerReloadPrimary();
+			}
+			break;
 
 			default:
 				break;

@@ -22,7 +22,7 @@ function M:OnClicked_ExitButton()
 end
 
 function M:OnClicked_CreateGameButton()
-    UE.UGameplayStatics.OpenLevel(self, "proto")
+    -- UE.UGameplayStatics.OpenLevel(self, "TestMap2")
 end
 
 function M:OnClicked_FindgameButton()
