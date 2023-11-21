@@ -237,7 +237,7 @@ void AFPSCharacterBase::DelayPlayArmReloadCallBack()
 void AFPSCharacterBase::AutoFire()
 {
 	//判断弹夹是否为空
-	if (ServerPrimaryWeapon->ClipCurrentAmmo)
+	if (ServerPrimaryWeapon->ClipCurrentAmmo && IsFiring)
 	{
 		//服务器调用，减少弹药，射线，伤害，弹孔，能被所有人听到开枪声和粒子
 		if (UKismetMathLibrary::VSize(GetVelocity()) > 0.1f)
