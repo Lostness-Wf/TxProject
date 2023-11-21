@@ -689,13 +689,13 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 		if (ServerWeapon)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("2"));
+			//UE_LOG(LogTemp, Warning, TEXT("2"));
 			ServerWeapon->EquipWeapon();
 			EquipPrimary(ServerWeapon);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("111111111111111111111111111111111111111"));
+			//UE_LOG(LogTemp, Warning, TEXT("111111111111111111111111111111111111111"));
 		}
 	}
 	break;
@@ -706,13 +706,13 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 		if (ServerWeapon)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("2"));
+			//UE_LOG(LogTemp, Warning, TEXT("2"));
 			ServerWeapon->EquipWeapon();
 			EquipPrimary(ServerWeapon);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1111111111111111111111111111111111111111"));
+			//UE_LOG(LogTemp, Warning, TEXT("1111111111111111111111111111111111111111"));
 		}
 	}
 	break;
@@ -723,13 +723,13 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 		if (ServerWeapon)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("2"));
+			//UE_LOG(LogTemp, Warning, TEXT("2"));
 			ServerWeapon->EquipWeapon();
 			EquipPrimary(ServerWeapon);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("11111111111111111111111111111111111111111"));
+			//UE_LOG(LogTemp, Warning, TEXT("11111111111111111111111111111111111111111"));
 		}
 	}
 	break;
@@ -740,13 +740,13 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 		if (ServerWeapon)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("2"));
+			//UE_LOG(LogTemp, Warning, TEXT("2"));
 			ServerWeapon->EquipWeapon();
 			EquipSrcondary(ServerWeapon);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("1111111111111111111111111111111111111111"));
+			//UE_LOG(LogTemp, Warning, TEXT("1111111111111111111111111111111111111111"));
 		}
 	}
 	break;
@@ -757,13 +757,13 @@ void AFPSCharacterBase::PurchaseWeapon(EWeaponType WeaponType)
 		AWeaponBaseServer* ServerWeapon = GetWorld()->SpawnActor<AWeaponBaseServer>(BlueprintVar, GetActorTransform(), SpawnInfo);
 		if (ServerWeapon)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("2"));
+			//UE_LOG(LogTemp, Warning, TEXT("2"));
 			ServerWeapon->EquipWeapon();
 			EquipPrimary(ServerWeapon);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("111111111111111111111111111111111"));
+			//UE_LOG(LogTemp, Warning, TEXT("111111111111111111111111111111111"));
 		}
 	}
 	break;
