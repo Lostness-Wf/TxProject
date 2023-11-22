@@ -88,6 +88,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsCurrentWeaponSniper();
 
+	UFUNCTION(BlueprintCallable)
+	void InputFireGrenade();
+
 public:
 	void EquipPrimary(AWeaponBaseServer* WeaponBaseServer);
 
@@ -285,6 +288,11 @@ public:
 	void ServerSetAiming(bool AimingState);
 	void ServerSetAiming_Implementation(bool AimingState);
 	bool ServerSetAiming_Validation(bool AimingState);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSpawnGrenade();
+	void ServerSpawnGrenade_Implementation();
+	void ServerSpawnGrenade_Validation();
 
 	//Éä»÷×é²¥
 	UFUNCTION(NetMulticast, Reliable, WithValidation)

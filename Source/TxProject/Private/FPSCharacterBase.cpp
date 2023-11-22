@@ -12,6 +12,7 @@
 #include "Net/UnrealNetwork.h"
 #include "UMG/Public/Blueprint/UserWidget.h"
 #include "AIController_DeathMatch.h"
+#include "GrenadeBase.h"
 
 // Sets default values
 AFPSCharacterBase::AFPSCharacterBase()
@@ -1057,6 +1058,24 @@ bool AFPSCharacterBase::ServerSetAiming_Validate(bool AimingState)
 	return true;
 }
 
+void AFPSCharacterBase::ServerSpawnGrenade_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("SpawnGrenade"));
+
+	FActorSpawnParameters SpawnInfo;
+	SpawnInfo.Owner = this;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnInfo.bNoFail = true;
+
+	UClass* BlueprintVar = StaticLoadClass(AGrenadeBase::StaticClass(), nullptr, TEXT("/Game/Blueprint/Weapon/Grenade/BP_Grenade.BP_Grenade_C"));
+	GetWorld()->SpawnActor<AGrenadeBase>(BlueprintVar, GetActorTransform(), SpawnInfo);
+}
+
+bool AFPSCharacterBase::ServerSpawnGrenade_Validate()
+{
+	return true;
+}
+
 void AFPSCharacterBase::MultiShooting_Implementation()
 {
 	AWeaponBaseServer* CurrentServerWeapon = GetCurrentServerTPBodysWeaponActor();
@@ -1525,4 +1544,9 @@ bool AFPSCharacterBase::IsCurrentWeaponSniper()
 	{
 		return false;
 	}
+}
+
+void AFPSCharacterBase::InputFireGrenade()
+{
+	ServerSpawnGrenade();
 }

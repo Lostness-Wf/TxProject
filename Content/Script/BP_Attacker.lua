@@ -64,4 +64,8 @@ function M:Aiming_Released()
 	self:InputAimingReleased()
 end
 
+function M:Grenade_Pressed()
+	self:InputFireGrenade();
+end
+
 return M
