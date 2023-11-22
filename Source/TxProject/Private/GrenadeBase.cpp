@@ -4,7 +4,8 @@
 #include "GrenadeBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "PhysicsEngine/RadialForceComponent.h"
-#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AGrenadeBase::AGrenadeBase()
@@ -17,6 +18,9 @@ AGrenadeBase::AGrenadeBase()
 
 	RadialForce = CreateDefaultSubobject<URadialForceComponent>(TEXT("RadialForce"));
 	RadialForce->SetupAttachment(GrenadeMesh);
+
+	ExplosionEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplosionEffect"));
+	ExplosionEffect->SetupAttachment(GrenadeMesh);
 }
 
 // Called when the game starts or when spawned
@@ -48,12 +52,9 @@ void AGrenadeBase::MulticastExplosion_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("MulticastExplosion"));
 
-	FActorSpawnParameters SpawnInfo;
-	SpawnInfo.Owner = this;
-	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnInfo.bNoFail = true;
-
 	RadialForce->FireImpulse();
+	ExplosionEffect->ActivateSystem(true);
+	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
 }
 
 bool AGrenadeBase::MulticastExplosion_Validate()

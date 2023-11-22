@@ -33,7 +33,10 @@ private:
 	URadialForceComponent* RadialForce;
 
 	UPROPERTY(EditAnywhere, Category = "ExplosionEffect")
-	UParticleSystem* ExplosionEffect;
+	UParticleSystemComponent* ExplosionEffect;
+	
+	UPROPERTY(EditAnywhere, Category = "ExplosionEffect")
+	USoundBase* ExplosionSound;
 public:
 	UFUNCTION()
 	void Explosion();
