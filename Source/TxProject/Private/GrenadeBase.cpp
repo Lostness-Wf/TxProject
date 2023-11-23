@@ -6,6 +6,8 @@
 #include "PhysicsEngine/RadialForceComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
+#include "FPSCharacterBase.h"
 
 // Sets default values
 AGrenadeBase::AGrenadeBase()
@@ -21,6 +23,13 @@ AGrenadeBase::AGrenadeBase()
 
 	ExplosionEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ExplosionEffect"));
 	ExplosionEffect->SetupAttachment(GrenadeMesh);
+
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+	SphereCollision->SetupAttachment(GrenadeMesh);
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SphereCollision->SetCollisionObjectType(ECC_WorldDynamic);
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &AGrenadeBase::OnOtherBeginOverlap);
+	SphereCollision->OnComponentEndOverlap.AddDynamic(this, &AGrenadeBase::OnOtherEndOverlap);
 }
 
 // Called when the game starts or when spawned
@@ -48,10 +57,26 @@ void AGrenadeBase::Explosion()
 	ServerExplosion();
 }
 
+void AGrenadeBase::OnOtherBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AFPSCharacterBase* Player = Cast<AFPSCharacterBase>(OtherActor);
+	if (Player)
+	{
+		PlayerInCollision.Add(Player);
+	}
+}
+
+void AGrenadeBase::OnOtherEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	AFPSCharacterBase* Player = Cast<AFPSCharacterBase>(OtherActor);
+	if (Player)
+	{
+		PlayerInCollision.Remove(Player);
+	}
+}
+
 void AGrenadeBase::MulticastExplosion_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("MulticastExplosion"));
-
 	RadialForce->FireImpulse();
 	ExplosionEffect->ActivateSystem(true);
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
@@ -64,7 +89,11 @@ bool AGrenadeBase::MulticastExplosion_Validate()
 
 void AGrenadeBase::ServerExplosion_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ServerExplosion"));
+	TSubclassOf<UDamageType> DamageType;
+	for (auto Player : PlayerInCollision)
+	{
+		Player->GrenadeExplosion();
+	}
 	MulticastExplosion();
 }
 

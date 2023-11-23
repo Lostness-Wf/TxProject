@@ -606,7 +606,6 @@ void AFPSCharacterBase::DamagePlayer(UPhysicalMaterial* PhysicalMaterial, AActor
 void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser)
 {
 	Health -= Damage;
-
 	ClientUpdateHealthUI(Health, DamageCauser);
 
 	if (Health <= 0)
@@ -619,6 +618,13 @@ void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AContro
 	//Temp
 	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("PlayerName : %s Health : %f"),*GetName(), Health));
 
+}
+
+void AFPSCharacterBase::GrenadeExplosion()
+{
+	ClientUpdateHealthUI(0, this);
+	IsDead = true;
+	DeathMatchDeath(this);
 }
 
 void AFPSCharacterBase::MulticastPlayHeadSound_Implementation()

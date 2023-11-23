@@ -7,6 +7,8 @@
 #include "GrenadeBase.generated.h"
 
 class URadialForceComponent;
+class USphereComponent;
+class AFPSCharacterBase;
 
 UCLASS()
 class TXPROJECT_API AGrenadeBase : public AActor
@@ -37,9 +39,22 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "ExplosionEffect")
 	USoundBase* ExplosionSound;
+
+	UPROPERTY(EditAnywhere, Category = "Collision")
+	USphereComponent* SphereCollision;
+
+	UPROPERTY()
+	TArray<AFPSCharacterBase*> PlayerInCollision;
+
 public:
 	UFUNCTION()
 	void Explosion();
+
+	UFUNCTION()
+	void OnOtherBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOtherEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION(NetMulticast, Reliable, WithValidation)
 	void MulticastExplosion();

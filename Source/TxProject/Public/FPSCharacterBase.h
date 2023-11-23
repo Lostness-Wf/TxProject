@@ -219,6 +219,9 @@ public:
 	UFUNCTION()
 	void OnHit(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser);
 
+	UFUNCTION()
+	void GrenadeExplosion();
+
 	UPROPERTY(EditAnywhere, Category = "Health")
 	float Health = 100;
 
