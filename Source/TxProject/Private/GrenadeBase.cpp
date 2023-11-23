@@ -80,6 +80,8 @@ void AGrenadeBase::MulticastExplosion_Implementation()
 	RadialForce->FireImpulse();
 	ExplosionEffect->ActivateSystem(true);
 	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
+
+	ServerDestroyActor();
 }
 
 bool AGrenadeBase::MulticastExplosion_Validate()
@@ -95,11 +97,19 @@ void AGrenadeBase::ServerExplosion_Implementation()
 		Player->GrenadeExplosion(GetOwner());
 	}
 	MulticastExplosion();
-
-	Destroy();
 }
 
 bool AGrenadeBase::ServerExplosion_Validate()
+{
+	return true;
+}
+
+void AGrenadeBase::ServerDestroyActor_Implementation()
+{
+	Destroy();
+}
+
+bool AGrenadeBase::ServerDestroyActor_Validate()
 {
 	return true;
 }

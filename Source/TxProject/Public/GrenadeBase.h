@@ -27,10 +27,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
+public:
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	UStaticMeshComponent* GrenadeMesh;
 
+private:
 	UPROPERTY(VisibleAnywhere, Category = "Force")
 	URadialForceComponent* RadialForce;
 
@@ -65,4 +66,9 @@ public:
 	void ServerExplosion();
 	void ServerExplosion_Implementation();
 	void ServerExplosion_Validation();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerDestroyActor();
+	void ServerDestroyActor_Implementation();
+	void ServerDestroyActor_Validation();
 };

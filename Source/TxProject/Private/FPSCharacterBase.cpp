@@ -1072,10 +1072,13 @@ void AFPSCharacterBase::ServerSpawnGrenade_Implementation()
 	SpawnInfo.Owner = this;
 	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnInfo.bNoFail = true;
-
+	
 	UClass* BlueprintVar = StaticLoadClass(AGrenadeBase::StaticClass(), nullptr, TEXT("/Game/Blueprint/Weapon/Grenade/BP_Grenade.BP_Grenade_C"));
-	AGrenadeBase* Grenade = GetWorld()->SpawnActor<AGrenadeBase>(BlueprintVar, GetActorTransform(), SpawnInfo);
+	AGrenadeBase* Grenade = GetWorld()->SpawnActor<AGrenadeBase>(BlueprintVar, PlayerCamera->GetComponentTransform(), SpawnInfo);
 	Grenade->SetOwner(this);
+	FVector ActorForward = GetOwner()->GetActorForwardVector();
+	
+	Grenade->GrenadeMesh->SetPhysicsLinearVelocity(ActorForward * 1800.0f, false);
 }
 
 bool AFPSCharacterBase::ServerSpawnGrenade_Validate()
