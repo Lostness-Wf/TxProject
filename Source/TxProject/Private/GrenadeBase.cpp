@@ -92,9 +92,11 @@ void AGrenadeBase::ServerExplosion_Implementation()
 	TSubclassOf<UDamageType> DamageType;
 	for (auto Player : PlayerInCollision)
 	{
-		Player->GrenadeExplosion();
+		Player->GrenadeExplosion(GetOwner());
 	}
 	MulticastExplosion();
+
+	Destroy();
 }
 
 bool AGrenadeBase::ServerExplosion_Validate()

@@ -620,11 +620,11 @@ void AFPSCharacterBase::OnHit(AActor* DasmagedActor, float Damage, class AContro
 
 }
 
-void AFPSCharacterBase::GrenadeExplosion()
+void AFPSCharacterBase::GrenadeExplosion(AActor* Attacker)
 {
-	ClientUpdateHealthUI(0, this);
+	ClientUpdateHealthUI(0, Attacker);
 	IsDead = true;
-	DeathMatchDeath(this);
+	DeathMatchDeath(Attacker);
 }
 
 void AFPSCharacterBase::MulticastPlayHeadSound_Implementation()
@@ -1074,7 +1074,8 @@ void AFPSCharacterBase::ServerSpawnGrenade_Implementation()
 	SpawnInfo.bNoFail = true;
 
 	UClass* BlueprintVar = StaticLoadClass(AGrenadeBase::StaticClass(), nullptr, TEXT("/Game/Blueprint/Weapon/Grenade/BP_Grenade.BP_Grenade_C"));
-	GetWorld()->SpawnActor<AGrenadeBase>(BlueprintVar, GetActorTransform(), SpawnInfo);
+	AGrenadeBase* Grenade = GetWorld()->SpawnActor<AGrenadeBase>(BlueprintVar, GetActorTransform(), SpawnInfo);
+	Grenade->SetOwner(this);
 }
 
 bool AFPSCharacterBase::ServerSpawnGrenade_Validate()
