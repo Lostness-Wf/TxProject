@@ -672,7 +672,8 @@ void AFPSCharacterBase::StartWithKindOfWeapon()
 	if (HasAuthority())
 	{
 		//Ëæ»úÎäÆ÷
-		PurchaseWeapon(static_cast<EWeaponType>(UKismetMathLibrary::RandomIntegerInRange(0, static_cast<int8>(EWeaponType::EEnd) - 1)));
+		//PurchaseWeapon(static_cast<EWeaponType>(UKismetMathLibrary::RandomIntegerInRange(0, static_cast<int8>(EWeaponType::EEnd) - 1)));
+		PurchaseWeapon(EWeaponType::AK47);
 	}
 	else
 	{
