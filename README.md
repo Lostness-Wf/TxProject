@@ -1,3 +1,1 @@
-# TxProject
-
-FPS Online Game
+# 跨平台广域网联机FPS游戏
